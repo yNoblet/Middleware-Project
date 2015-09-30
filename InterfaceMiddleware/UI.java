@@ -1,3 +1,5 @@
+package InterfaceMiddleware;
+
 import javax.swing.JFrame;
 
 public class UI {

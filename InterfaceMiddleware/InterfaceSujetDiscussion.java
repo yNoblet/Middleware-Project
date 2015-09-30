@@ -1,3 +1,5 @@
+package InterfaceMiddleware;
+
 import java.rmi.*;
 
 public interface InterfaceSujetDiscussion extends Remote {
