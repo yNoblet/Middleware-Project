@@ -2,4 +2,10 @@ import java.rmi.*;
 
 public interface InterfaceAffichageClient extends Remote {
 public void affiche(String Message) throws RemoteException;
-
+<<<<<<< HEAD
+}
+=======
+public zob4;
+public Michel;
+}
+>>>>>>> a1e75520ccd3a7370f8ac816e6319a4a97c6a376
