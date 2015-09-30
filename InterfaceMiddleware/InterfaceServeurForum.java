@@ -1,3 +1,5 @@
+package interfaceMiddleware;
+
 import java.rmi.*;
 
 public interface InterfaceServeurForum extends Remote {
