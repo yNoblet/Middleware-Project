@@ -1,4 +1,4 @@
-package interfaceMiddleware;
+package InterfaceMiddleware;
 
 import java.rmi.*;
 
