@@ -1,4 +1,4 @@
-package interfaceMiddleware;
+package InterfaceMiddleware;
 
 
 public class Main {
@@ -8,8 +8,11 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		UI ihm = new UI();
-		ihm.affichage();
+		
+		//UI ihm = new UI();
+		//ihm.affichage();
+		
+		FenConnection f = new FenConnection();
 	}
 
 }
