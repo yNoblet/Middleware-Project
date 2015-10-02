@@ -1,4 +1,4 @@
-package interfaceMiddleware;
+package interfaces;
 
 public class Message {
 	private String author;

@@ -1,4 +1,4 @@
-package interfaceMiddleware;
+package interfaces;
 
 public class Client {
 	private String pseudo;
