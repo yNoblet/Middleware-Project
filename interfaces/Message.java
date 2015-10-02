@@ -4,8 +4,16 @@ public class Message {
 	private String author;
 	private String text;
 	
+	public Message(String pseudo, String message) {
+		author = pseudo;
+		text = message;
+	} 
 	
-	
+	@Override
+	public String toString() {
+		return author+": "+text;
+	}
+
 	public String getAuthor() {
 		return author;
 	}

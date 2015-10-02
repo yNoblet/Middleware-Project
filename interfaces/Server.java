@@ -1,24 +1,52 @@
 package interfaces;
 
-import java.util.ArrayList;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-public class Server {
-	private ArrayList<Account> account_list;
-	private ArrayList<Topic> topic_list;
+public class Server extends UnicastRemoteObject implements IServer {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5348901788833610650L;
+	private Map<String, Account> accounts;
+	private Map<String, Topic> topics;
 	
-	
-	
-	
-	public ArrayList<Account> getAccount_list() {
-		return account_list;
+	public Server() throws RemoteException {
+		accounts = new HashMap<String, Account>();
+		topics = new HashMap<String, Topic>();
 	}
-	public void setAccount_list(ArrayList<Account> account_list) {
-		this.account_list = account_list;
+	
+	public Map<String, Account> getAccount_list() {
+		return accounts;
 	}
-	public ArrayList<Topic> getTopic_list() {
-		return topic_list;
+	public void setAccount_list(Map<String, Account> account_list) {
+		this.accounts = account_list;
 	}
-	public void setTopic_list(ArrayList<Topic> topic_list) {
-		this.topic_list = topic_list;
+	public Map<String, Topic> getTopic_list() {
+		return topics;
+	}
+	public void setTopic_list(Map<String, Topic> topic_list) {
+		this.topics = topic_list;
+	}
+	
+	@Override
+	public Account getAccount(String pseudo) throws RemoteException {
+		return accounts.get(pseudo);
+	}
+	@Override
+	public Set<String> getTopicTitles() throws RemoteException {
+		return topics.keySet();
+	}
+	@Override
+	public void newTopic(String title) throws RemoteException {
+		topics.put(title, new Topic(title));
+		System.out.println("new topic : "+title);
+	}
+	@Override
+	public Topic getTopic(String title) throws RemoteException {
+		return topics.get(title);
 	}
 }
