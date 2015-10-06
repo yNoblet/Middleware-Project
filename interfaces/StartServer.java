@@ -6,7 +6,7 @@ public class StartServer {
 	public static void main(String[] args) {
 		 try {
 	            IServer obj = new Server();
-	            Registry reg = java.rmi.registry.LocateRegistry.createRegistry(1095);
+	            Registry reg = java.rmi.registry.LocateRegistry.createRegistry(1097);
 	            // System.setSecurityManager(new java.rmi.RMISecurityManager());
 
 	            reg.bind("obj", obj); 

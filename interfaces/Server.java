@@ -1,6 +1,8 @@
 package interfaces;
 
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,20 +35,32 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public Account getAccount(String pseudo) throws RemoteException {
-		return accounts.get(pseudo);
+	public void getAccount(IClient cl) throws RemoteException {
+		if(accounts.get(cl.getPseudo()) == null){
+			accounts.put(cl.getPseudo(), new Account(cl.getPseudo()));
+		}
+		//return accounts.get(cl.getPseudo());
 	}
 	@Override
 	public Set<String> getTopicTitles() throws RemoteException {
 		return topics.keySet();
 	}
 	@Override
-	public void newTopic(String title) throws RemoteException {
-		topics.put(title, new Topic(title));
-		System.out.println("new topic : "+title);
+	public boolean newTopic(String title, IClient author) throws RemoteException {
+		if(topics.get(title) == null){
+			topics.put(title, new Topic(title, author.getPseudo()));
+			accounts.get(author.getPseudo()).addSubscription(title);
+			System.out.println("new topic : "+title);
+			return true;
+		}
+		return false;
 	}
 	@Override
-	public Topic getTopic(String title) throws RemoteException {
+	public ITopic getTopic(String title) throws RemoteException {
 		return topics.get(title);
+	}
+	@Override
+	public void goToTopic(String topicTitle, IClient client) throws RemoteException {
+		topics.get(topicTitle).connect_client(client);
 	}
 }

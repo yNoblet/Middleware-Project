@@ -13,6 +13,7 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	 */
 	private static final long serialVersionUID = -3180799191650643596L;
 	private String title;
+	private String author;
 	private Set<String> client_list;
 	private ArrayList<Message> historic;
 	private Set<IClient> connected_clients;
@@ -22,6 +23,12 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	}
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 	public Set<String> getClient_list() {
 		return client_list;
@@ -36,10 +43,12 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		this.historic = historic;
 	}
 	
-	public Topic(String title) throws RemoteException {
+	public Topic(String title, String author) throws RemoteException {
 		super();
 		this.title = title;
+		this.author = author;
 		this.client_list = new HashSet<String>();
+		this.client_list.add(author);
 		this.historic = new ArrayList<Message>();
 		this.connected_clients = new HashSet<IClient>();
 	}
@@ -64,6 +73,7 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	public void post(String pseudo, String message) throws RemoteException {
 		System.out.println(pseudo+": "+message);
 		historic.add(new Message(pseudo, message));
+		notifyMembers();
 	}
 	@Override
 	public void connect_client(IClient cl) throws RemoteException {
@@ -73,5 +83,11 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	@Override
 	public void deconnect_client(IClient cl) throws RemoteException {
 		connected_clients.remove(cl);
+	}
+	private void notifyMembers() throws RemoteException{
+		String h = getHistoricString();
+		for(IClient c : connected_clients){
+			c.refresh(h);
+		}
 	}
 }
