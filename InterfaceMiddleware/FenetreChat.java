@@ -1,15 +1,24 @@
 package InterfaceMiddleware;
 
+
+import java.net.URI;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -21,7 +30,7 @@ public class FenetreChat extends Application {
     private TextArea output; 
     private final static String newline = "\n";
 
-    public void start(Stage stage) {
+    public void start(Stage primaryStage) {
  
     	GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -31,13 +40,26 @@ public class FenetreChat extends Application {
 
  Scene scene = new Scene(grid, 750, 300);
 
-        stage.setTitle("Forum de discussion");
-        stage.setScene(scene);
-        stage.show();
+ primaryStage.setTitle("Forum de discussion");
+ primaryStage.setScene(scene);
+ primaryStage.show();
         
         Button btnR = new Button();
         btnR.setText("Retour");
         grid.add(btnR, 1,0);
+        btnR.setOnAction(
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                    	
+                    	openFenetreTopic();
+                    
+                    }
+                    public void openFenetreTopic(){
+                    	FenetreTopic ft = new FenetreTopic();
+                		ft.start(primaryStage);
+                    }
+                });
         
         Text scenetitle = new Text("Topic Soins et beauté");
         grid.add(scenetitle, 0,0);
