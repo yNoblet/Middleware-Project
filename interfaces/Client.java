@@ -8,19 +8,18 @@ public class Client extends UnicastRemoteObject implements IClient {
 	 * 
 	 */
 	private static final long serialVersionUID = -5697099462906475057L;
-
-	protected Client() throws RemoteException {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
 	private String pseudo;
-
-	public String getPseudo() {
+	
+	protected Client(String p) throws RemoteException {
+		super();
+		this.pseudo = p;
+	}
+	
+	public String getPseudo() throws RemoteException {
 		return pseudo;
 	}
 
-	public void setPseudo(String pseudo) {
+	public void setPseudo(String pseudo) throws RemoteException {
 		this.pseudo = pseudo;
 	}
 
