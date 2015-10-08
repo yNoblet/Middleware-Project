@@ -9,9 +9,8 @@ public class StartServer {
 	            Registry reg = java.rmi.registry.LocateRegistry.createRegistry(1097);
 	            // System.setSecurityManager(new java.rmi.RMISecurityManager());
 
-	            reg.bind("obj", obj); 
-	            System.out.println("Zob");
-	            
+	            reg.bind("Server", obj); 
+	            System.out.println("Server launched");
 	            
 	        } catch (Exception e) {
 	            System.err.println("Server exception: " + e.toString());

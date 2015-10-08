@@ -35,11 +35,11 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public void getAccount(IClient cl) throws RemoteException {
+	public IAccount getAccount(IClient cl) throws RemoteException {
 		if(accounts.get(cl.getPseudo()) == null){
 			accounts.put(cl.getPseudo(), new Account(cl.getPseudo()));
 		}
-		//return accounts.get(cl.getPseudo());
+		return accounts.get(cl.getPseudo());
 	}
 	@Override
 	public Set<String> getTopicTitles() throws RemoteException {

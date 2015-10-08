@@ -5,42 +5,43 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import InterfaceMiddleware.FenetreConnexion;
+
 public class StartClient {
 	public static void main(String[] args) {
 		try {
 			
 			int remotePort = 1097;
 			String remoteIp = "localhost"; // ou IP si distant
-			String remoteObjectName = "obj";
+			String remoteObjectName = "Server";
 
 			//System.setSecurityManager(new java.rmi.RMISecurityManager());
 
 			Registry registry;
 		
-			registry = LocateRegistry.getRegistry("S046V7pc04", remotePort);
+			registry = LocateRegistry.getRegistry(remoteIp, remotePort);
 		
 			IServer s;
 			s = (IServer) registry.lookup(remoteObjectName);
 			
 			if(s != null){
-				System.out.println("youpi");
+				System.out.println("Server reached");
+				//s.newTopic("Thibaut suxx","Bob");
+				Client c1 = new Client("Bob");
+				//System.out.println(s);
+				//System.out.println(c1);
+				IAccount a = (IAccount) s.getAccount(c1);
+				//System.out.println(acc);System.out.println(acc.getPseudo());
+				s.newTopic("Lalala", c1);
+				s.goToTopic("Lalala", c1);
+				ITopic t = s.getTopic("Lalala");
+				//System.out.println(t);
+				t.post(c1.getPseudo(), "Je suis Bob");
+				t.post(c1.getPseudo(), "Ah non je suis Robert");
+				
 			} else {
-				System.out.println("merde");
+				System.out.println("No server!!!");
 			}
-			//s.newTopic("Thibaut suxx","Bob");
-			Client c1 = new Client("Bob");
-			//System.out.println(s);
-			//System.out.println(c1);
-			s.getAccount(c1);
-			//System.out.println(acc);System.out.println(acc.getPseudo());
-			s.newTopic("Lalala", c1);
-			s.goToTopic("Lalala", c1);
-			ITopic t = s.getTopic("Lalala");
-			//System.out.println(t);
-			t.post(c1.getPseudo(), "Je suis Bob");
-			t.post(c1.getPseudo(), "Ah non je suis Robert");
-			
-			
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
