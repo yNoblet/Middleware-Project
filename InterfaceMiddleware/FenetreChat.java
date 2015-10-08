@@ -31,7 +31,7 @@ public class FenetreChat extends Application {
 	private TextField input;
 	private TextArea output; 
 	private final static String newline = "\n";
-	String Topic;
+	String topic;
 	String Identifiants;
 
 	public void start(Stage primaryStage) {
@@ -41,13 +41,17 @@ public class FenetreChat extends Application {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
-
 		Scene scene = new Scene(grid, 750, 300);
-
 		primaryStage.setTitle("Forum de discussion");
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
+		Text scenetitle = new Text("Topic "+ topic + " :");
+		Text identifiants = new Text("Bienvenue "+ Identifiants +" !");
+		
+		
+		
+		
 		Button btnDeco = new Button();
 		btnDeco.setText("Déconnexion");
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
@@ -81,10 +85,10 @@ public class FenetreChat extends Application {
 					}
 				});
 
-		Text scenetitle = new Text("Topic "+ Topic + " :");
-		grid.add(scenetitle, 0,1);
+		
+		
 
-		Text identifiants = new Text("Bienvenue "+ Identifiants +" !");
+		
 		
 		HBox hbButtons = new HBox();
 		hbButtons.getChildren().addAll(identifiants);
@@ -93,11 +97,9 @@ public class FenetreChat extends Application {
 		vbButtons.getChildren().addAll(btnDeco,btnR);
 		
 		
-		grid.add(hbButtons, 0,0);
-		grid.add(vbButtons, 1,0);
 
 		output = new TextArea();
-		grid.add(output, 0,2);
+		
 		output.setEditable(false);
 		output.setStyle("-fx-border-style: none");
 		output.setFocusTraversable(false);
@@ -112,7 +114,7 @@ public class FenetreChat extends Application {
 
 			}
 		});
-		grid.add(input,0,3);
+		
 
 		Button btn = new Button();
 		btn.setText("Valider");
@@ -123,13 +125,19 @@ public class FenetreChat extends Application {
 				AfficherMsg();
 			}
 
-		});
-		grid.add(btn, 1,3);
+		});	
+		
+		grid.add(scenetitle, 0,1);
+		grid.add(hbButtons, 0,0);
+		grid.add(vbButtons, 1,0);
+		grid.add(output, 0,2);
+		grid.add(input,0,3);
+		grid.add(btn, 1,3);	
 	}
 
 
 	public void GetTopic (String Top, String Name){
-		Topic = Top;
+		topic = Top;
 		Identifiants= Name;
 	}
 	public static void main(String[] args) {
@@ -139,6 +147,7 @@ public class FenetreChat extends Application {
 		String text = input.getText();
 		output.appendText(Identifiants +" : "+text + newline);
 		input.selectAll();
+		input.clear();
 	}
 
 

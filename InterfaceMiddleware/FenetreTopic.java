@@ -35,18 +35,14 @@ public class FenetreTopic extends Application {
 		grid.setPadding(new Insets(25, 25, 25, 25));
 
 		Scene scene = new Scene(grid, 500, 500);
-
 		primaryStage.setTitle("Forum de discussion");
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-
-
+		
 		Text identifiants = new Text("Bienvenue "+ Identifiants);
-
-
 		Text TopicsIns = new Text("Topics inscrits :");
-
+		Text TopicsDispos = new Text("Topics disponibles :");
 
 		Button btnNew = new Button();
 		btnNew.setText("Nouveau");
@@ -66,13 +62,11 @@ public class FenetreTopic extends Application {
 						btnNT.setText("Créer");
 						Scene dialogScene = new Scene(dialogVbox, 300, 120);
 						dialog.setScene(dialogScene);
-
 						dialog.show();
 						btnNT.setOnAction(
 								new EventHandler<ActionEvent>() {
 									@Override
 									public void handle(ActionEvent event) {
-
 										openFenetreChat();
 										dialog.close();
 									}
@@ -91,7 +85,6 @@ public class FenetreTopic extends Application {
 		Button btnDeco = new Button();
 		btnDeco.setText("Déconnexion");
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
-
 			@Override
 			public void handle(ActionEvent event) {
 				openFenetreConnexion();
@@ -114,7 +107,6 @@ public class FenetreTopic extends Application {
 
 		Button btnGo = new Button();
 		btnGo.setText("Aller");
-
 		btnGo.setOnAction(
 				new EventHandler<ActionEvent>() {
 					@Override
@@ -147,7 +139,7 @@ public class FenetreTopic extends Application {
 				});
 
 
-		Text TopicsDispos = new Text("Topics disponibles :");
+		
 
 
 
@@ -176,13 +168,12 @@ public class FenetreTopic extends Application {
 
 
 		grid.add(vbButtons, 0,0);
-		//        grid.add(btnNew      , 1,0);
-		        grid.add(TopicsIns  , 0,1);
-		       grid.add(ListInscrits, 0,2);
-		       grid.add(InsButtons   , 0,3);
-		       grid.add(TopicsDispos, 0,4);
-	           grid.add(ListDispo   , 0,5);
-		       grid.add(btnInscri    , 0,6);
+		grid.add(TopicsIns  , 0,1);
+		grid.add(ListInscrits, 0,2);
+		grid.add(InsButtons   , 0,3);
+		grid.add(TopicsDispos, 0,4);
+	    grid.add(ListDispo   , 0,5);
+	    grid.add(btnInscri    , 0,6);
 
 	}
 	public void getID (String ID) {
