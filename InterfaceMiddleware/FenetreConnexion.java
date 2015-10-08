@@ -30,7 +30,14 @@ public class FenetreConnexion extends Application {
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.ENTER) {
-					openFenetreTopic();
+					if (login.getText().equals("")){
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Erreur");
+						alert.setHeaderText("Erreur d'identifiant");
+						alert.setContentText("Vous n'avez pas rentré votre identifiant !");
+						alert.showAndWait();	
+					}
+					else openFenetreTopic();
 				}
 			}
 				public void openFenetreTopic(){

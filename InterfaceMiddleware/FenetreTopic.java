@@ -30,11 +30,11 @@ public class FenetreTopic extends Application {
 
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(25, 25, 25, 25));
+		grid.setHgap(0);
+		grid.setVgap(5);
+		grid.setPadding(new Insets(5, 5, 5, 5));
 
-		Scene scene = new Scene(grid, 500, 500);
+		Scene scene = new Scene(grid, 400, 500);
 		primaryStage.setTitle("Forum de discussion");
 		primaryStage.setScene(scene);
 		primaryStage.show();
