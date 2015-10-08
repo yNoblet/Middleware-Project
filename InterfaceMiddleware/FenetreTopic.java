@@ -23,6 +23,7 @@ public class FenetreTopic extends Application {
     private TextField input;
     private TextArea output; 
     private final static String newline = "\n";
+    String Identifiants;
 
     public void start(Stage primaryStage) {
  
@@ -32,18 +33,23 @@ public class FenetreTopic extends Application {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
- Scene scene = new Scene(grid, 450, 300);
+ Scene scene = new Scene(grid, 500, 300);
 
  primaryStage.setTitle("Forum de discussion");
  primaryStage.setScene(scene);
  primaryStage.show();
         
-        Text scenetitle = new Text("Topics inscrits :");
-        grid.add(scenetitle, 0,0);
+
         
-        Button btnN = new Button();
-        btnN.setText("Nouveau");
-        btnN.setOnAction(
+        Text identifiants = new Text("Bienvenue "+ Identifiants +" !");
+        
+        
+        Text TopicsIns = new Text("Topics inscrits :");
+        
+        
+        Button btnNew = new Button();
+        btnNew.setText("Nouveau");
+        btnNew.setOnAction(
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
@@ -78,11 +84,11 @@ public class FenetreTopic extends Application {
                                 });
                     }
                  });
-        grid.add(btnN, 1,0);
         
-        Button btnR = new Button();
-        btnR.setText("Déconnexion");
-        btnR.setOnAction(new EventHandler<ActionEvent>() {
+        
+        Button btnDeco = new Button();
+        btnDeco.setText("Déconnexion");
+        btnDeco.setOnAction(new EventHandler<ActionEvent>() {
  
             @Override
             public void handle(ActionEvent event) {
@@ -95,19 +101,19 @@ public class FenetreTopic extends Application {
         		
         	}
         });
-        grid.add(btnR, 1,1);
+       
         
-        ListView<String> list = new ListView<String>();
+        ListView<String> ListInscrits = new ListView<String>();
         ObservableList<String> items =FXCollections.observableArrayList (
             "Soins et Beauté", "API Rest", "Chaîne de Markov");
-        list.setItems(items);
-        grid.add(list, 0,1);
+        ListInscrits.setItems(items);
         
         
-        Button btnA = new Button();
-        btnA.setText("Aller");
-        grid.add(btnA, 0,2);
-        btnA.setOnAction(
+        
+        Button btnGo = new Button();
+        btnGo.setText("Aller");
+       
+        btnGo.setOnAction(
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
@@ -125,20 +131,20 @@ public class FenetreTopic extends Application {
         
         
         
-        Text scenetitle2 = new Text("Topics disponibles :");
-        grid.add(scenetitle2, 0,3);
+        Text TopicsDispos = new Text("Topics disponibles :");
+       
         
         
-        ListView<String> list2 = new ListView<String>();
+        ListView<String> ListDispo = new ListView<String>();
         ObservableList<String> items2 =FXCollections.observableArrayList (
             "Toilettage canin", "toto", "zob", "zaza","GL Squad", "Robespierre", "Titeuf");
-        list2.setItems(items2);
-        grid.add(list2, 0,4);
+        ListDispo.setItems(items2);
         
-        Button btnS = new Button();
-        btnS.setText("S'inscrire");
-        grid.add(btnS, 0,5);
-        btnS.setOnAction(
+        
+        Button btnInscri = new Button();
+        btnInscri.setText("S'inscrire");
+        
+        btnInscri.setOnAction(
         new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -172,6 +178,19 @@ public class FenetreTopic extends Application {
             }
         });
         
+        grid.add(identifiants, 0,0);
+        grid.add(btnNew, 1,0);
+        grid.add(TopicsIns, 0,1);
+        grid.add(btnDeco, 1,1);
+        grid.add(ListInscrits, 0,2);
+        grid.add(btnGo, 0,3);
+        grid.add(TopicsDispos, 0,4);
+        grid.add(ListDispo, 0,5);
+        grid.add(btnInscri, 0,6);
+        
+    }
+    public void getID (String ID) {
+    	Identifiants = ID;
     }
     public static void main(String[] args) {
         launch(args);

@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.jdesktop.xswingx.PromptSupport;
+
 
 public class UI extends JFrame{
 
@@ -55,7 +55,7 @@ public class UI extends JFrame{
     		    fenetre2.setVisible(true);
 	        };
 	    });
-	    PromptSupport.setPrompt("Pseudo", jtf);
+	    
 	    
 	    panel.add(label);
 	    panel.add(jtf);

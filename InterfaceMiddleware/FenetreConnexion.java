@@ -40,6 +40,7 @@ public class FenetreConnexion extends Application {
             public void openFenetreTopic(){
         		System.out.println(jtf.getText()+" a été identifié");
         		FenetreTopic ft = new FenetreTopic();
+        		ft.getID(jtf.getText());
         		ft.start(primaryStage);
         		System.out.println("zozo)");
         		

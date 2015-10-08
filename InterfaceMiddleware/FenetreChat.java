@@ -29,6 +29,7 @@ public class FenetreChat extends Application {
     private TextField input;
     private TextArea output; 
     private final static String newline = "\n";
+    String Topic;
 
     public void start(Stage primaryStage) {
  
@@ -61,7 +62,7 @@ public class FenetreChat extends Application {
                     }
                 });
         
-        Text scenetitle = new Text("Topic Soins et beauté");
+        Text scenetitle = new Text("Topic "+ Topic + " :");
         grid.add(scenetitle, 0,0);
         
 
@@ -88,7 +89,11 @@ public class FenetreChat extends Application {
         });
         grid.add(btn, 1,2);
     }
+    public void GetTopic (String Name){
+    	Topic = Name;
+    }
     public static void main(String[] args) {
         launch(args);
     }
+    
 }
