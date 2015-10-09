@@ -1,11 +1,9 @@
-package interfaces;
+package core;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
-import InterfaceMiddleware.FenetreConnexion;
 
 public class StartClient {
 	public static void main(String[] args) {
@@ -27,14 +25,15 @@ public class StartClient {
 			if(s != null){
 				System.out.println("Server reached");
 				//s.newTopic("Thibaut suxx","Bob");
-				Client c1 = new Client("Bob");
+				IClient c1 = new Client("Bob");
 				//System.out.println(s);
 				//System.out.println(c1);
 				IAccount a = (IAccount) s.getAccount(c1);
 				//System.out.println(acc);System.out.println(acc.getPseudo());
 				s.newTopic("Lalala", c1);
-				s.goToTopic("Lalala", c1);
+				
 				ITopic t = s.getTopic("Lalala");
+				t.connectClient(c1);
 				//System.out.println(t);
 				t.post(c1.getPseudo(), "Je suis Bob");
 				t.post(c1.getPseudo(), "Ah non je suis Robert");

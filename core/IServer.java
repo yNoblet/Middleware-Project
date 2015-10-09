@@ -1,4 +1,4 @@
-package interfaces;
+package core;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -9,5 +9,4 @@ public interface IServer extends Remote {
 	public Set<String> getTopicTitles() throws RemoteException;
 	public boolean newTopic(String title, IClient author) throws RemoteException;
 	public ITopic getTopic(String title) throws RemoteException;
-	public void goToTopic(String title, IClient cl) throws RemoteException;
 }

@@ -1,4 +1,4 @@
-package interfaces;
+package core;
 
 public class Message {
 	private String author;

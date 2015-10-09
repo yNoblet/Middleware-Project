@@ -1,4 +1,4 @@
-package InterfaceMiddleware;
+package gui;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,10 +18,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class FenetreConnexion extends Application {
+public class SignInWindow extends Application {
 	TextField login = new TextField();
-	
-	
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -37,16 +35,14 @@ public class FenetreConnexion extends Application {
 						alert.setContentText("Vous n'avez pas rentré votre identifiant !");
 						alert.showAndWait();	
 					}
-					else openFenetreTopic();
+					else {
+						TopicWindow ft = new TopicWindow();
+						ft.getID(login.getText());
+						ft.start(primaryStage);
+					}
 				}
 			}
-				public void openFenetreTopic(){
-					FenetreTopic ft = new FenetreTopic();
-					ft.getID(login.getText());
-					ft.start(primaryStage);
-
-				}
-			});
+		});
 	
 		Button btn = new Button();
 		btn.setText("Valider");
@@ -61,25 +57,20 @@ public class FenetreConnexion extends Application {
 					alert.setContentText("Vous n'avez pas rentré votre identifiant !");
 					alert.showAndWait();	
 				}
-				else openFenetreTopic();
-					
-			}
-
-			public void openFenetreTopic(){
-				FenetreTopic ft = new FenetreTopic();
-				ft.getID(login.getText());
-				ft.start(primaryStage);
-
+				else {
+					TopicWindow ft = new TopicWindow();
+					ft.getID(login.getText());
+					ft.start(primaryStage);
+				}	
 			}
 		});
-
 
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.getStylesheets().add("InterfaceMiddleware/test.css");
+		grid.getStylesheets().add("GUI/style.css");
 
 		Scene scene = new Scene(grid, 350, 150);
 
@@ -96,13 +87,9 @@ public class FenetreConnexion extends Application {
 		grid.add(login, 1, 1);
 		grid.add(btn, 1, 4);
 
-
-
 	}
 	public static void main(String[] args) {
 		launch(args);
 	}
-
-
 
 }

@@ -1,4 +1,4 @@
-package interfaces;
+package core;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -14,9 +14,9 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	private static final long serialVersionUID = -3180799191650643596L;
 	private String title;
 	private String author;
-	private Set<String> client_list;
+	private Set<String> clientList;
 	private ArrayList<Message> historic;
-	private Set<IClient> connected_clients;
+	private Set<IClient> connectedClients;
 	
 	public String getTitle() {
 		return title;
@@ -31,10 +31,10 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		this.author = author;
 	}
 	public Set<String> getClient_list() {
-		return client_list;
+		return clientList;
 	}
 	public void setClient_list(Set<String> client_list) {
-		this.client_list = client_list;
+		this.clientList = client_list;
 	}
 	public ArrayList<Message> getHistoric() {
 		return historic;
@@ -47,10 +47,10 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		super();
 		this.title = title;
 		this.author = author;
-		this.client_list = new HashSet<String>();
-		this.client_list.add(author);
+		this.clientList = new HashSet<String>();
+		this.clientList.add(author);
 		this.historic = new ArrayList<Message>();
-		this.connected_clients = new HashSet<IClient>();
+		this.connectedClients = new HashSet<IClient>();
 	}
 	
 	public String getHistoricString(){
@@ -63,11 +63,11 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	
 	@Override
 	public void subscribe(String pseudo) throws RemoteException {
-		client_list.add(pseudo);
+		clientList.add(pseudo);
 	}
 	@Override
 	public void unsubscribe(String pseudo) throws RemoteException {
-		client_list.remove(pseudo);
+		clientList.remove(pseudo);
 	}
 	@Override
 	public void post(String pseudo, String message) throws RemoteException {
@@ -76,17 +76,19 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		notifyMembers();
 	}
 	@Override
-	public void connect_client(IClient cl) throws RemoteException {
-		connected_clients.add(cl);
+	public void connectClient(IClient cl) throws RemoteException {
+		connectedClients.add(cl);
+		cl.addConnectedTopic(this);
 		cl.refresh(getHistoricString());
 	}
 	@Override
-	public void deconnect_client(IClient cl) throws RemoteException {
-		connected_clients.remove(cl);
+	public void disconnectClient(IClient cl) throws RemoteException {
+		connectedClients.remove(cl);
+		cl.removeConnectedTopic(this);
 	}
 	private void notifyMembers() throws RemoteException{
 		String h = getHistoricString();
-		for(IClient c : connected_clients){
+		for(IClient c : connectedClients){
 			c.refresh(h);
 		}
 	}

@@ -1,8 +1,6 @@
-package interfaces;
+package core;
 
-import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,17 +19,17 @@ public class Server extends UnicastRemoteObject implements IServer {
 		topics = new HashMap<String, Topic>();
 	}
 	
-	public Map<String, Account> getAccount_list() {
+	public Map<String, Account> getAccountList() {
 		return accounts;
 	}
-	public void setAccount_list(Map<String, Account> account_list) {
-		this.accounts = account_list;
+	public void setAccount_list(Map<String, Account> accountList) {
+		this.accounts = accountList;
 	}
-	public Map<String, Topic> getTopic_list() {
+	public Map<String, Topic> getTopicList() {
 		return topics;
 	}
-	public void setTopic_list(Map<String, Topic> topic_list) {
-		this.topics = topic_list;
+	public void setTopic_list(Map<String, Topic> topicList) {
+		this.topics = topicList;
 	}
 	
 	@Override
@@ -59,8 +57,5 @@ public class Server extends UnicastRemoteObject implements IServer {
 	public ITopic getTopic(String title) throws RemoteException {
 		return topics.get(title);
 	}
-	@Override
-	public void goToTopic(String topicTitle, IClient client) throws RemoteException {
-		topics.get(topicTitle).connect_client(client);
-	}
+	
 }

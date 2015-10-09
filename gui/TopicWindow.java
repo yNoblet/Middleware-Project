@@ -1,4 +1,4 @@
-package InterfaceMiddleware;
+package gui;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,7 +9,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -19,11 +18,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
-public class FenetreTopic extends Application {
+public class TopicWindow extends Application {
 
-	private TextField input;
-	private TextArea output; 
-	private final static String newline = "\n";
 	String Identifiants;
 
 	public void start(Stage primaryStage) {
@@ -63,21 +59,16 @@ public class FenetreTopic extends Application {
 						Scene dialogScene = new Scene(dialogVbox, 300, 120);
 						dialog.setScene(dialogScene);
 						dialog.show();
-						btnNT.setOnAction(
-								new EventHandler<ActionEvent>() {
-									@Override
-									public void handle(ActionEvent event) {
-										openFenetreChat();
-										dialog.close();
-									}
-									public void openFenetreChat(){
-										FenetreChat ft = new FenetreChat();
-										ft.GetTopic(Topic.getText(),Identifiants);
-										ft.start(primaryStage);
-										System.out.println("zozo)");
-
-									}
-								});
+						btnNT.setOnAction(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								ChatWindow ft = new ChatWindow();
+								ft.getTopic(Topic.getText(),Identifiants);
+								ft.start(primaryStage);
+								System.out.println("zozo)");
+								dialog.close();
+							}
+						});
 					}
 				});
 
@@ -87,13 +78,9 @@ public class FenetreTopic extends Application {
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				openFenetreConnexion();
-			}
-			public void openFenetreConnexion(){
-				FenetreConnexion ft = new FenetreConnexion();
+				SignInWindow ft = new SignInWindow();
 				ft.start(primaryStage);
 				System.out.println("zozo)");
-
 			}
 		});
 
@@ -107,41 +94,24 @@ public class FenetreTopic extends Application {
 
 		Button btnGo = new Button();
 		btnGo.setText("Aller");
-		btnGo.setOnAction(
-				new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-
-						openFenetreChat();
-
-
-					}
-					public void openFenetreChat(){
-						FenetreChat ft = new FenetreChat();
-						ft.GetTopic(ListInscrits.getSelectionModel().getSelectedItem(), Identifiants);
-						ft.start(primaryStage);
-						System.out.println("zozo)");
-
-					}
-				});
+		btnGo.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ChatWindow ft = new ChatWindow();
+				ft.getTopic(ListInscrits.getSelectionModel().getSelectedItem(), Identifiants);
+				ft.start(primaryStage);
+				System.out.println("zozo)");
+			}
+		});
 		
 		Button btnDes = new Button();
 		btnDes.setText("Se désinscrire");
-		btnDes.setOnAction(
-				new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
+		btnDes.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
 
-						
-
-
-					}
-				});
-
-
-		
-
-
+			}
+		});
 
 		ListView<String> ListDispo = new ListView<String>();
 		ObservableList<String> items2 =FXCollections.observableArrayList (

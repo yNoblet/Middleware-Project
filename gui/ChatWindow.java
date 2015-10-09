@@ -1,19 +1,12 @@
-package InterfaceMiddleware;
-
-
-import java.net.URI;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+package gui;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -26,7 +19,7 @@ import javafx.stage.Stage;
 
 
 
-public class FenetreChat extends Application {
+public class ChatWindow extends Application {
 
 	private TextField input;
 	private TextArea output; 
@@ -61,7 +54,7 @@ public class FenetreChat extends Application {
 				openFenetreConnexion();
 			}
 			public void openFenetreConnexion(){
-				FenetreConnexion ft = new FenetreConnexion();
+				SignInWindow ft = new SignInWindow();
 				ft.start(primaryStage);
 				System.out.println("zozo)");
 
@@ -80,7 +73,7 @@ public class FenetreChat extends Application {
 
 					}
 					public void openFenetreTopic(){
-						FenetreTopic ft = new FenetreTopic();
+						TopicWindow ft = new TopicWindow();
 						ft.start(primaryStage);
 					}
 				});
@@ -109,7 +102,7 @@ public class FenetreChat extends Application {
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.ENTER) {
-					AfficherMsg();
+					displayMsg();
 				}
 
 			}
@@ -122,7 +115,7 @@ public class FenetreChat extends Application {
 
 			@Override
 			public void handle(ActionEvent event) {
-				AfficherMsg();
+				displayMsg();
 			}
 
 		});	
@@ -136,14 +129,14 @@ public class FenetreChat extends Application {
 	}
 
 
-	public void GetTopic (String Top, String Name){
+	public void getTopic (String Top, String Name){
 		topic = Top;
 		Identifiants= Name;
 	}
 	public static void main(String[] args) {
 		launch(args);
 	}
-	public  void AfficherMsg(){
+	public  void displayMsg(){
 		String text = input.getText();
 		output.appendText(Identifiants +" : "+text + newline);
 		input.selectAll();

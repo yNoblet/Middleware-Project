@@ -1,4 +1,4 @@
-package interfaces;
+package core;
 
 import java.rmi.registry.Registry;
 
