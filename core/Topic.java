@@ -71,9 +71,9 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	}
 	@Override
 	public void post(String pseudo, String message) throws RemoteException {
-		System.out.println(pseudo+": "+message);
-		historic.add(new Message(pseudo, message));
-		notifyMembers();
+		Message msg = new Message(pseudo, message);
+		historic.add(msg);
+		notifyMembers(msg.toString());
 	}
 	@Override
 	public void connectClient(IClient cl) throws RemoteException {
@@ -86,10 +86,9 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		connectedClients.remove(cl);
 		cl.removeConnectedTopic(this);
 	}
-	private void notifyMembers() throws RemoteException{
-		String h = getHistoricString();
+	private void notifyMembers(String msg) throws RemoteException{
 		for(IClient c : connectedClients){
-			c.refresh(h);
+			c.refresh(msg);
 		}
 	}
 }

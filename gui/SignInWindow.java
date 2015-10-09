@@ -1,4 +1,10 @@
 package gui;
+
+import java.rmi.RemoteException;
+
+import core.Client;
+import core.IClient;
+import core.IServer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,10 +25,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class SignInWindow extends Application {
-	TextField login = new TextField();
+	TextField login;
+	IServer server;
 	
 	@Override
 	public void start(Stage primaryStage) {
+		
+		login= new TextField();
 		
 		login.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
@@ -37,8 +46,14 @@ public class SignInWindow extends Application {
 					}
 					else {
 						TopicWindow ft = new TopicWindow();
-						ft.getID(login.getText());
-						ft.start(primaryStage);
+						try {
+							ft.setClient(new Client(login.getText(), server));
+							ft.start(primaryStage);
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 					}
 				}
 			}
@@ -58,9 +73,22 @@ public class SignInWindow extends Application {
 					alert.showAndWait();	
 				}
 				else {
+					try {
+						IClient cl = new Client(login.getText(), server);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					/*
 					TopicWindow ft = new TopicWindow();
-					ft.getID(login.getText());
-					ft.start(primaryStage);
+					try {
+						ft.setClient(new Client(login.getText(), server));
+						ft.start(primaryStage);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}*/
 				}	
 			}
 		});
@@ -70,7 +98,7 @@ public class SignInWindow extends Application {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.getStylesheets().add("GUI/style.css");
+		grid.getStylesheets().add("gui/style.css");
 
 		Scene scene = new Scene(grid, 350, 150);
 
@@ -88,6 +116,11 @@ public class SignInWindow extends Application {
 		grid.add(btn, 1, 4);
 
 	}
+	public void setServer(IServer s){
+		server=s;
+	}
+	
+	
 	public static void main(String[] args) {
 		launch(args);
 	}

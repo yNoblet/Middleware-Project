@@ -1,5 +1,7 @@
 package gui;
 
+import java.rmi.RemoteException;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -68,13 +70,13 @@ public class ChatWindow extends Application {
 				new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-
-						openFenetreTopic();
-
-					}
-					public void openFenetreTopic(){
 						TopicWindow ft = new TopicWindow();
-						ft.start(primaryStage);
+						try {
+							ft.start(primaryStage);
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				});
 

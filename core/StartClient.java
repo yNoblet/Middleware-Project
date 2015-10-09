@@ -5,8 +5,18 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class StartClient {
+import gui.SignInWindow;
+import javafx.application.Application;
+import javafx.stage.Stage;
+
+public class StartClient extends Application{
 	public static void main(String[] args) {
+		launch(args);
+	}
+
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		// TODO Auto-generated method stub
 		try {
 			
 			int remotePort = 1097;
@@ -23,6 +33,12 @@ public class StartClient {
 			s = (IServer) registry.lookup(remoteObjectName);
 			
 			if(s != null){
+				
+				SignInWindow sw = new SignInWindow();
+				sw.setServer(s);
+				sw.start(primaryStage);
+				
+				/*
 				System.out.println("Server reached");
 				//s.newTopic("Thibaut suxx","Bob");
 				IClient c1 = new Client("Bob");
@@ -37,6 +53,9 @@ public class StartClient {
 				//System.out.println(t);
 				t.post(c1.getPseudo(), "Je suis Bob");
 				t.post(c1.getPseudo(), "Ah non je suis Robert");
+				*/
+				
+				
 				
 			} else {
 				System.out.println("No server!!!");
@@ -50,6 +69,5 @@ public class StartClient {
 			e.printStackTrace();
 		}
 
-		
 	}
 }

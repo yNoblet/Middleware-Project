@@ -1,4 +1,7 @@
 package gui;
+import java.rmi.RemoteException;
+
+import core.IClient;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,10 +22,10 @@ import javafx.stage.Stage;
 
 
 public class TopicWindow extends Application {
+	
+	IClient client;
 
-	String Identifiants;
-
-	public void start(Stage primaryStage) {
+	public void start(Stage primaryStage) throws RemoteException {
 
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -36,41 +39,45 @@ public class TopicWindow extends Application {
 		primaryStage.show();
 
 		
-		Text identifiants = new Text("Bienvenue "+ Identifiants);
+		Text identifiants = new Text("Bienvenue "+ client.getPseudo());
 		Text TopicsIns = new Text("Topics inscrits :");
 		Text TopicsDispos = new Text("Topics disponibles :");
 
 		Button btnNew = new Button();
 		btnNew.setText("Nouveau");
-		btnNew.setOnAction(
-				new EventHandler<ActionEvent>() {
+		btnNew.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				final Stage dialog = new Stage();
+				dialog.initModality(Modality.APPLICATION_MODAL);
+				dialog.initOwner(primaryStage);
+				VBox dialogVbox = new VBox(20);
+				dialogVbox.getChildren().add(new Text("Choisissez le titre du nouveau Topic :"));
+				TextField Topic = new TextField();
+				dialogVbox.getChildren().add(Topic);
+				Button btnNT = new Button();
+				dialogVbox.getChildren().add(btnNT);
+				btnNT.setText("Créer");
+				Scene dialogScene = new Scene(dialogVbox, 300, 120);
+				dialog.setScene(dialogScene);
+				dialog.show();
+				btnNT.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						final Stage dialog = new Stage();
-						dialog.initModality(Modality.APPLICATION_MODAL);
-						dialog.initOwner(primaryStage);
-						VBox dialogVbox = new VBox(20);
-						dialogVbox.getChildren().add(new Text("Choisissez le titre du nouveau Topic :"));
-						TextField Topic = new TextField();
-						dialogVbox.getChildren().add(Topic);
-						Button btnNT = new Button();
-						dialogVbox.getChildren().add(btnNT);
-						btnNT.setText("Créer");
-						Scene dialogScene = new Scene(dialogVbox, 300, 120);
-						dialog.setScene(dialogScene);
-						dialog.show();
-						btnNT.setOnAction(new EventHandler<ActionEvent>() {
-							@Override
-							public void handle(ActionEvent event) {
-								ChatWindow ft = new ChatWindow();
-								ft.getTopic(Topic.getText(),Identifiants);
-								ft.start(primaryStage);
-								System.out.println("zozo)");
-								dialog.close();
-							}
-						});
+						ChatWindow ft = new ChatWindow();
+						try {
+							ft.getTopic(Topic.getText(),client.getPseudo());
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						ft.start(primaryStage);
+						System.out.println("zozo)");
+						dialog.close();
 					}
 				});
+			}
+		});
 
 
 		Button btnDeco = new Button();
@@ -98,7 +105,12 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				ChatWindow ft = new ChatWindow();
-				ft.getTopic(ListInscrits.getSelectionModel().getSelectedItem(), Identifiants);
+				try {
+					ft.getTopic(ListInscrits.getSelectionModel().getSelectedItem(), client.getPseudo());
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				ft.start(primaryStage);
 				System.out.println("zozo)");
 			}
@@ -138,16 +150,16 @@ public class TopicWindow extends Application {
 
 
 		grid.add(vbButtons, 0,0);
-		grid.add(TopicsIns  , 0,1);
+		grid.add(TopicsIns, 0,1);
 		grid.add(ListInscrits, 0,2);
-		grid.add(InsButtons   , 0,3);
+		grid.add(InsButtons, 0,3);
 		grid.add(TopicsDispos, 0,4);
-	    grid.add(ListDispo   , 0,5);
-	    grid.add(btnInscri    , 0,6);
+	    grid.add(ListDispo, 0,5);
+	    grid.add(btnInscri, 0,6);
 
 	}
-	public void getID (String ID) {
-		Identifiants = ID;
+	public void setClient(IClient cl) {
+		client = cl;
 	}
 	public static void main(String[] args) {
 		launch(args);
