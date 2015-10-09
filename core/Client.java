@@ -3,7 +3,11 @@ package core;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import gui.ChatWindow;
 import gui.TopicWindow;
@@ -25,10 +29,9 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.pseudo = p;
 		connectedTopics = new ArrayList<ITopic>();
 		server = s;
-		account = (IAccount) s.getAccount(this);
+		server.getTopicTitles();
 		
-		cw = new ChatWindow();
-		tw = new TopicWindow();
+		account = (IAccount) s.getAccount(p);
 		
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			
@@ -75,12 +78,28 @@ public class Client extends UnicastRemoteObject implements IClient {
 
 	@Override
 	public void setChatWindow(ChatWindow cw) throws RemoteException {
-		
+		this.cw=cw;
 	}
 
 	@Override
 	public void setTopicWindow(TopicWindow tw) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		this.tw =tw;
+		tw.setPseudo(pseudo);
+		tw.setClient(this);
+		tw.setServer(server);
+		tw.setSubscribedTopic(account.getSubscriptionList());
+		ArrayList<String> at = server.getTopicTitles();
+		at.removeAll(account.getSubscriptionList());
+		tw.setAvailableTopic(at);
+	}
+
+	@Override
+	public void addSubscribedTopic(String t) throws RemoteException {
+		account.addSubscription(t);
+	}
+
+	@Override
+	public void removeSubscribedTopic(String t) throws RemoteException {
+		account.removeSubscription(t);
 	}
 }

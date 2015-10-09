@@ -15,6 +15,8 @@ public interface IClient extends Remote {
 	public void onDisconnect() throws RemoteException;
 	public void addConnectedTopic(ITopic t) throws RemoteException;
 	public void removeConnectedTopic(ITopic t) throws RemoteException;
+	public void addSubscribedTopic(String t) throws RemoteException;
+	public void removeSubscribedTopic(String t) throws RemoteException;
 	public void setChatWindow(ChatWindow cw) throws RemoteException;
 	public void setTopicWindow(TopicWindow tw) throws RemoteException;
 }

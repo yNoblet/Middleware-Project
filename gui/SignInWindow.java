@@ -47,7 +47,8 @@ public class SignInWindow extends Application {
 					else {
 						TopicWindow ft = new TopicWindow();
 						try {
-							ft.setClient(new Client(login.getText(), server));
+							IClient cl=new Client(login.getText(), server);
+							cl.setTopicWindow(ft);
 							ft.start(primaryStage);
 						} catch (RemoteException e) {
 							// TODO Auto-generated catch block
@@ -73,22 +74,15 @@ public class SignInWindow extends Application {
 					alert.showAndWait();	
 				}
 				else {
-					try {
-						IClient cl = new Client(login.getText(), server);
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					/*
 					TopicWindow ft = new TopicWindow();
 					try {
-						ft.setClient(new Client(login.getText(), server));
+						IClient cl=new Client(login.getText(), server);
+						cl.setTopicWindow(ft);
 						ft.start(primaryStage);
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}*/
+					}
 				}	
 			}
 		});

@@ -2,6 +2,8 @@ package core;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,21 +35,26 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public IAccount getAccount(IClient cl) throws RemoteException {
-		if(accounts.get(cl.getPseudo()) == null){
-			accounts.put(cl.getPseudo(), new Account(cl.getPseudo()));
+	public IAccount getAccount(String cl) throws RemoteException {
+		if(accounts.get(cl) == null){
+			accounts.put(cl, new Account(cl));
 		}
-		return accounts.get(cl.getPseudo());
+		return accounts.get(cl);
 	}
 	@Override
-	public Set<String> getTopicTitles() throws RemoteException {
-		return topics.keySet();
+	public ArrayList<String> getTopicTitles() throws RemoteException {
+		//String s=topics.keySet().toString();
+		//s = s.substring(1,s.length()-1);
+		ArrayList<String> l = new ArrayList<String>();
+		l.addAll(topics.keySet());
+		return l;
 	}
+	
 	@Override
-	public boolean newTopic(String title, IClient author) throws RemoteException {
+	public boolean newTopic(String title, String p) throws RemoteException {
 		if(topics.get(title) == null){
-			topics.put(title, new Topic(title, author.getPseudo()));
-			accounts.get(author.getPseudo()).addSubscription(title);
+			topics.put(title, new Topic(title, p));
+			accounts.get(p).addSubscription(title);
 			System.out.println("new topic : "+title);
 			return true;
 		}

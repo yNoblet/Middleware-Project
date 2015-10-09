@@ -1,7 +1,9 @@
 package gui;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import core.IClient;
+import core.IServer;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,6 +26,10 @@ import javafx.stage.Stage;
 public class TopicWindow extends Application {
 	
 	IClient client;
+	IServer server;
+	Text identifiants = new Text("");
+	ObservableList<String> subscribedTopics = FXCollections.observableArrayList();
+	ObservableList<String> availableTopics = FXCollections.observableArrayList();
 
 	public void start(Stage primaryStage) throws RemoteException {
 
@@ -38,8 +44,6 @@ public class TopicWindow extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		
-		Text identifiants = new Text("Bienvenue "+ client.getPseudo());
 		Text TopicsIns = new Text("Topics inscrits :");
 		Text TopicsDispos = new Text("Topics disponibles :");
 
@@ -86,17 +90,15 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				SignInWindow ft = new SignInWindow();
+				ft.setServer(server);
 				ft.start(primaryStage);
-				System.out.println("zozo)");
+				System.out.println("Logout");
 			}
 		});
 
 
 		ListView<String> ListInscrits = new ListView<String>();
-		ObservableList<String> items =FXCollections.observableArrayList (
-				"Soins et Beauté", "API Rest", "Chaîne de Markov");
-		ListInscrits.setItems(items);
-
+		ListInscrits.setItems(subscribedTopics);
 		
 
 		Button btnGo = new Button();
@@ -121,14 +123,20 @@ public class TopicWindow extends Application {
 		btnDes.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-
+				try {
+					String title = ListInscrits.getSelectionModel().getSelectedItem();
+					client.removeSubscribedTopic(title);
+					subscribedTopics.remove(title);
+					availableTopics.add(title);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
 		ListView<String> ListDispo = new ListView<String>();
-		ObservableList<String> items2 =FXCollections.observableArrayList (
-				"Toilettage canin", "toto", "zob", "zaza","GL Squad", "Robespierre", "Titeuf");
-		ListDispo.setItems(items2);
+		ListDispo.setItems(availableTopics);
 
 
 		Button btnInscri = new Button();
@@ -138,6 +146,15 @@ public class TopicWindow extends Application {
 				new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
+						try {
+							String title = ListDispo.getSelectionModel().getSelectedItem();
+							client.addSubscribedTopic(title);
+							subscribedTopics.add(title);
+							availableTopics.remove(title);
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						
 					}
 				});
@@ -161,7 +178,25 @@ public class TopicWindow extends Application {
 	public void setClient(IClient cl) {
 		client = cl;
 	}
+	public void setPseudo(String p){
+		identifiants = new Text("Bienvenue "+p);
+	}
+	
+	public void setSubscribedTopic(Collection<String> c){
+		subscribedTopics.addAll(c);
+	}
+	public void setAvailableTopic(Collection<String> c){
+		availableTopics.addAll(c);
+	}
+	
+	public void setServer(IServer server) {
+		this.server = server;
+	}
+	
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
+	
 }
