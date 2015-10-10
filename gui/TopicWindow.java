@@ -2,9 +2,13 @@ package gui;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
+import javax.swing.event.ListDataEvent;
+
 import core.IClient;
 import core.IServer;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,6 +17,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -21,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 
 public class TopicWindow extends Application {
@@ -103,6 +109,7 @@ public class TopicWindow extends Application {
 
 		Button btnGo = new Button();
 		btnGo.setText("Aller");
+		btnGo.setDisable(true);
 		btnGo.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -118,8 +125,14 @@ public class TopicWindow extends Application {
 			}
 		});
 		
+		Button btnInscri = new Button();
+		btnInscri.setText("S'inscrire");
+		btnInscri.setDisable(true);
+		
 		Button btnDes = new Button();
 		btnDes.setText("Se désinscrire");
+		btnDes.setDisable(true);
+		
 		btnDes.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -128,19 +141,26 @@ public class TopicWindow extends Application {
 					client.removeSubscribedTopic(title);
 					subscribedTopics.remove(title);
 					availableTopics.add(title);
+					if (subscribedTopics.isEmpty()){
+						btnGo.setDisable(true);
+						btnDes.setDisable(true);
+					}
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
+		
+		ListInscrits.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				btnGo.setDisable(newValue==null);
+				btnDes.setDisable(newValue==null);
+			}
+		});
 
 		ListView<String> ListDispo = new ListView<String>();
 		ListDispo.setItems(availableTopics);
-
-
-		Button btnInscri = new Button();
-		btnInscri.setText("S'inscrire");
 
 		btnInscri.setOnAction(
 				new EventHandler<ActionEvent>() {
@@ -151,6 +171,8 @@ public class TopicWindow extends Application {
 							client.addSubscribedTopic(title);
 							subscribedTopics.add(title);
 							availableTopics.remove(title);
+							if (availableTopics.isEmpty())
+								btnInscri.setDisable(true);
 						} catch (RemoteException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -158,6 +180,13 @@ public class TopicWindow extends Application {
 						
 					}
 				});
+		
+		ListDispo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				btnInscri.setDisable(newValue==null);
+			}
+		});
+		
 		HBox vbButtons = new HBox();
 		vbButtons.setSpacing(150);
 		vbButtons.getChildren().addAll(identifiants,btnDeco);
