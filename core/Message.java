@@ -11,7 +11,7 @@ public class Message {
 	
 	@Override
 	public String toString() {
-		return author+": "+text;
+		return author+": "+text+"\n";
 	}
 
 	public String getAuthor() {

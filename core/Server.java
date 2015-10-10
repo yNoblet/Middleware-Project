@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +16,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 	private static final long serialVersionUID = 5348901788833610650L;
 	private Map<String, Account> accounts;
 	private Map<String, Topic> topics;
+	private Collection<IClient> connectedClient;
 	
 	public Server() throws RemoteException {
 		accounts = new HashMap<String, Account>();
 		topics = new HashMap<String, Topic>();
+		connectedClient=new ArrayList<IClient>();
 	}
 	
 	public Map<String, Account> getAccountList() {
@@ -54,8 +57,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 	public boolean newTopic(String title, String p) throws RemoteException {
 		if(topics.get(title) == null){
 			topics.put(title, new Topic(title, p));
-			accounts.get(p).addSubscription(title);
+			//accounts.get(p).addSubscription(title);
 			System.out.println("new topic : "+title);
+			for(IClient c: connectedClient){
+				c.addTopic(title);
+			}
+			
 			return true;
 		}
 		return false;
@@ -63,6 +70,25 @@ public class Server extends UnicastRemoteObject implements IServer {
 	@Override
 	public ITopic getTopic(String title) throws RemoteException {
 		return topics.get(title);
+	}
+
+	@Override
+	public boolean delTopic(String title, String p) throws RemoteException {
+		topics.remove(title);
+		for(IClient c: connectedClient){
+			c.removeTopic(title);
+		}
+		return true;
+	}
+
+	@Override
+	public void addClient(IClient cl) throws RemoteException {
+		connectedClient.add(cl);
+	}
+
+	@Override
+	public void removeClient(IClient cl) throws RemoteException {
+		connectedClient.remove(cl);
 	}
 	
 }

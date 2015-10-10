@@ -56,7 +56,7 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	public String getHistoricString(){
 		String hist = "";
 		for(Message msg : historic){
-			hist += msg.toString()+"\n";
+			hist += msg.toString();
 		}
 		return hist;
 	}

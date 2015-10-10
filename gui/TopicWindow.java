@@ -1,8 +1,7 @@
 package gui;
+
 import java.rmi.RemoteException;
 import java.util.Collection;
-
-import javax.swing.event.ListDataEvent;
 
 import core.IClient;
 import core.IServer;
@@ -16,45 +15,49 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 
 public class TopicWindow extends Application {
 	
 	IClient client;
 	IServer server;
-	Text identifiants = new Text("");
+	Text identifiants = new Text("Bienvenue test");
 	ObservableList<String> subscribedTopics = FXCollections.observableArrayList();
 	ObservableList<String> availableTopics = FXCollections.observableArrayList();
 
 	public void start(Stage primaryStage) throws RemoteException {
 
+		identifiants.setStyle("-fx-font-size:19px"); 
+		
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(0);
-		grid.setVgap(5);
-		grid.setPadding(new Insets(5, 5, 5, 5));
+		grid.setVgap(0);
+		grid.setPadding(new Insets(0, 0, 0, 0));
 
 		Scene scene = new Scene(grid, 400, 500);
 		primaryStage.setTitle("Forum de discussion");
 		primaryStage.setScene(scene);
+		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text TopicsIns = new Text("Topics inscrits :");
-		Text TopicsDispos = new Text("Topics disponibles :");
+		Text TopicsIns = new Text("Sujets inscrits :");
+		Text TopicsDispos = new Text("Sujets disponibles :");
 
 		Button btnNew = new Button();
-		btnNew.setText("Nouveau");
+		btnNew.setText("+ Nouveau sujet");
+		btnNew.setPrefWidth(400);
 		btnNew.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -62,7 +65,7 @@ public class TopicWindow extends Application {
 				dialog.initModality(Modality.APPLICATION_MODAL);
 				dialog.initOwner(primaryStage);
 				VBox dialogVbox = new VBox(20);
-				dialogVbox.getChildren().add(new Text("Choisissez le titre du nouveau Topic :"));
+				dialogVbox.getChildren().add(new Text("Choisissez le titre du nouveau sujet :"));
 				TextField Topic = new TextField();
 				dialogVbox.getChildren().add(Topic);
 				Button btnNT = new Button();
@@ -74,6 +77,7 @@ public class TopicWindow extends Application {
 				btnNT.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
+						/*
 						ChatWindow ft = new ChatWindow();
 						try {
 							ft.getTopic(Topic.getText(),client.getPseudo());
@@ -83,7 +87,31 @@ public class TopicWindow extends Application {
 						}
 						ft.start(primaryStage);
 						System.out.println("zozo)");
-						dialog.close();
+						dialog.close();*/
+						if (Topic.getText().equals("")){
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("Erreur");
+							alert.setHeaderText("Erreur de nom de sujet");
+							alert.setContentText("Vous n'avez pas rentré votre nom de sujet !");
+							alert.showAndWait();	
+						}
+						else {
+							try {
+								if (server.newTopic(Topic.getText(), client.getPseudo())){
+									dialog.close();
+								}
+								else{
+									Alert alert = new Alert(AlertType.ERROR);
+									alert.setTitle("Erreur");
+									alert.setHeaderText("Erreur de nom de sujet");
+									alert.setContentText("Un sujet du même nom existe déja !");
+									alert.showAndWait();	
+								}
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
 					}
 				});
 			}
@@ -113,15 +141,14 @@ public class TopicWindow extends Application {
 		btnGo.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				ChatWindow ft = new ChatWindow();
+				ChatWindow cw = new ChatWindow();
 				try {
-					ft.getTopic(ListInscrits.getSelectionModel().getSelectedItem(), client.getPseudo());
+					client.setChatWindow(cw, ListInscrits.getSelectionModel().getSelectedItem());
+					cw.start(primaryStage);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				ft.start(primaryStage);
-				System.out.println("zozo)");
 			}
 		});
 		
@@ -188,7 +215,10 @@ public class TopicWindow extends Application {
 		});
 		
 		HBox vbButtons = new HBox();
-		vbButtons.setSpacing(150);
+		//vbButtons.setStyle("-fx-background-color: #336699;");
+		vbButtons.setPrefWidth(400);
+		vbButtons.setPadding(new Insets(0, 0, 2, 3));
+		identifiants.setWrappingWidth(292);
 		vbButtons.getChildren().addAll(identifiants,btnDeco);
 		HBox InsButtons = new HBox();
 		InsButtons.setSpacing(10);
@@ -196,19 +226,23 @@ public class TopicWindow extends Application {
 
 
 		grid.add(vbButtons, 0,0);
-		grid.add(TopicsIns, 0,1);
-		grid.add(ListInscrits, 0,2);
-		grid.add(InsButtons, 0,3);
-		grid.add(TopicsDispos, 0,4);
-	    grid.add(ListDispo, 0,5);
-	    grid.add(btnInscri, 0,6);
+		grid.add(btnNew, 0, 1);
+		grid.add(TopicsIns, 0,2);
+		grid.add(ListInscrits, 0,3);
+		grid.add(InsButtons, 0,4);
+		grid.add(TopicsDispos, 0,5);
+	    grid.add(ListDispo, 0,6);
+	    grid.add(btnInscri, 0,7);
 
 	}
 	public void setClient(IClient cl) {
 		client = cl;
 	}
 	public void setPseudo(String p){
-		identifiants = new Text("Bienvenue "+p);
+		Text t= new Text("Bienvenue "+p);
+		t.setStyle("-fx-font-size:19px"); 
+		t.setWrappingWidth(292);
+		identifiants = t;
 	}
 	
 	public void setSubscribedTopic(Collection<String> c){
@@ -217,6 +251,15 @@ public class TopicWindow extends Application {
 	public void setAvailableTopic(Collection<String> c){
 		availableTopics.addAll(c);
 	}
+	
+	public void addAvailableTopic(String s){
+		availableTopics.add(s);
+	}
+	public void removeTopic(String s){
+		availableTopics.remove(s);
+		subscribedTopics.remove(s);
+	}
+	
 	
 	public void setServer(IServer server) {
 		this.server = server;

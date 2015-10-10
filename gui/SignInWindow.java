@@ -76,7 +76,7 @@ public class SignInWindow extends Application {
 				else {
 					TopicWindow ft = new TopicWindow();
 					try {
-						IClient cl=new Client(login.getText(), server);
+						IClient cl = new Client(login.getText(), server);
 						cl.setTopicWindow(ft);
 						ft.start(primaryStage);
 					} catch (RemoteException e) {
@@ -98,6 +98,7 @@ public class SignInWindow extends Application {
 
 		primaryStage.setTitle("Forum de discussion");
 		primaryStage.setScene(scene);
+		primaryStage.setResizable(false);
 		primaryStage.show();
 
 		Text scenetitle = new Text("Bienvenue");

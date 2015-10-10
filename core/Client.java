@@ -56,7 +56,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 
 	@Override
 	public void refresh(String message) throws RemoteException {
-		System.out.println(pseudo+" a reçu "+message);
+		cw.displayMsg(message);
 	}
 
 	@Override
@@ -64,6 +64,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		for (ITopic t: connectedTopics){
 			t.disconnectClient(this);
 		}
+		server.removeClient(this);
 	}
 
 	@Override
@@ -77,8 +78,18 @@ public class Client extends UnicastRemoteObject implements IClient {
 	}
 
 	@Override
-	public void setChatWindow(ChatWindow cw) throws RemoteException {
+	public void removeConnectedTopic(String topicTitle) throws RemoteException {
+		removeConnectedTopic(server.getTopic(topicTitle));
+	}
+
+	@Override
+	public void setChatWindow(ChatWindow cw, String topicTitle) throws RemoteException {
 		this.cw=cw;
+		cw.setIdentifiants(pseudo);
+		cw.setServer(server);
+		cw.setClient(this);
+		cw.setTopic(topicTitle);
+		server.getTopic(topicTitle).connectClient(this);
 	}
 
 	@Override
@@ -102,4 +113,25 @@ public class Client extends UnicastRemoteObject implements IClient {
 	public void removeSubscribedTopic(String t) throws RemoteException {
 		account.removeSubscription(t);
 	}
+
+	@Override
+	public void post(String msg, String topicTitle) throws RemoteException {
+		server.getTopic(topicTitle).post(pseudo, msg);
+	}
+
+	@Override
+	public void addTopic(String t) throws RemoteException {
+		if (tw!=null)
+			tw.addAvailableTopic(t);
+	}
+
+	@Override
+	public void removeTopic(String t) throws RemoteException {
+		if (tw != null)
+			tw.removeTopic(t);
+		if (cw!=null && cw.getTopic()==t){
+			
+		}
+	}
+
 }
