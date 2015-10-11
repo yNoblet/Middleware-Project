@@ -19,7 +19,6 @@ public class StartServer {
 	            b.addSubscription("c");
 	            
 	            Registry reg = java.rmi.registry.LocateRegistry.createRegistry(1097);
-	            // System.setSecurityManager(new java.rmi.RMISecurityManager());
 
 	            reg.bind("Server", obj); 
 	            

@@ -3,11 +3,9 @@ package core;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class Server extends UnicastRemoteObject implements IServer {
 	/**
@@ -22,6 +20,29 @@ public class Server extends UnicastRemoteObject implements IServer {
 		accounts = new HashMap<String, Account>();
 		topics = new HashMap<String, Topic>();
 		connectedClient=new ArrayList<IClient>();
+		
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					onDisconnect();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+				}
+			}
+		}));
+	}
+
+	public void onDisconnect() throws RemoteException{
+		for (IClient c : connectedClient){
+			try {
+				c.serverDown();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public Map<String, Account> getAccountList() {

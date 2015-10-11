@@ -3,11 +3,7 @@ package core;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import gui.ChatWindow;
 import gui.TopicWindow;
@@ -30,6 +26,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		connectedTopics = new ArrayList<ITopic>();
 		server = s;
 		server.getTopicTitles();
+		server.addClient(this);
 		
 		account = (IAccount) s.getAccount(p);
 		
@@ -59,8 +56,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		cw.displayMsg(message);
 	}
 
-	@Override
-	public void onDisconnect() throws RemoteException {
+	private void onDisconnect() throws RemoteException{
 		for (ITopic t: connectedTopics){
 			t.disconnectClient(this);
 		}
@@ -130,8 +126,17 @@ public class Client extends UnicastRemoteObject implements IClient {
 		if (tw != null)
 			tw.removeTopic(t);
 		if (cw!=null && cw.getTopic()==t){
-			
+			cw.onDeleteTopic();
 		}
+	}
+
+	@Override
+	public void serverDown() throws Exception {
+		System.out.println("Server down => exit");
+		if (cw!=null)
+			cw.serverDown();
+		if (tw!= null)
+			tw.serverDown();
 	}
 
 }

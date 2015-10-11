@@ -20,12 +20,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.input.KeyEvent;
 
 
 public class TopicWindow extends Application {
@@ -74,21 +76,12 @@ public class TopicWindow extends Application {
 				Scene dialogScene = new Scene(dialogVbox, 300, 120);
 				dialog.setScene(dialogScene);
 				dialog.show();
+				
 				btnNT.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						/*
-						ChatWindow ft = new ChatWindow();
-						try {
-							ft.getTopic(Topic.getText(),client.getPseudo());
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						ft.start(primaryStage);
-						System.out.println("zozo)");
-						dialog.close();*/
-						if (Topic.getText().equals("")){
+						String title = Topic.getText();
+						if (title.equals("")){
 							Alert alert = new Alert(AlertType.ERROR);
 							alert.setTitle("Erreur");
 							alert.setHeaderText("Erreur de nom de sujet");
@@ -97,8 +90,11 @@ public class TopicWindow extends Application {
 						}
 						else {
 							try {
-								if (server.newTopic(Topic.getText(), client.getPseudo())){
+								if (server.newTopic(title, client.getPseudo())){
 									dialog.close();
+									client.addSubscribedTopic(title);
+									subscribedTopics.add(title);
+									availableTopics.remove(title);
 								}
 								else{
 									Alert alert = new Alert(AlertType.ERROR);
@@ -114,6 +110,42 @@ public class TopicWindow extends Application {
 						}
 					}
 				});
+				
+				Topic.setOnKeyPressed(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent event) {
+						if (event.getCode() == KeyCode.ENTER) {
+							String title = Topic.getText();
+							if (title.equals("")){
+								Alert alert = new Alert(AlertType.ERROR);
+								alert.setTitle("Erreur");
+								alert.setHeaderText("Erreur de nom de sujet");
+								alert.setContentText("Vous n'avez pas rentré votre nom de sujet !");
+								alert.showAndWait();	
+							}
+							else {
+								try {
+									if (server.newTopic(title, client.getPseudo())){
+										dialog.close();
+										client.addSubscribedTopic(title);
+										subscribedTopics.add(title);
+										availableTopics.remove(title);
+									}
+									else{
+										Alert alert = new Alert(AlertType.ERROR);
+										alert.setTitle("Erreur");
+										alert.setHeaderText("Erreur de nom de sujet");
+										alert.setContentText("Un sujet du même nom existe déja !");
+										alert.showAndWait();	
+									}
+								} catch (RemoteException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				});
 			}
 		});
 
@@ -123,10 +155,15 @@ public class TopicWindow extends Application {
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				SignInWindow ft = new SignInWindow();
-				ft.setServer(server);
-				ft.start(primaryStage);
-				System.out.println("Logout");
+				try {
+					server.removeClient(client);
+					SignInWindow ft = new SignInWindow();
+					ft.setServer(server);
+					ft.start(primaryStage);
+					System.out.println("Logout");
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -265,6 +302,9 @@ public class TopicWindow extends Application {
 		this.server = server;
 	}
 	
+	public void serverDown(){
+		
+	}
 	
 	public static void main(String[] args) {
 		launch(args);

@@ -2,8 +2,6 @@ package gui;
 
 import java.rmi.RemoteException;
 
-import javax.print.attribute.standard.PrinterMoreInfoManufacturer;
-
 import core.IClient;
 import core.IServer;
 import javafx.application.Application;
@@ -30,8 +28,7 @@ import javafx.stage.Stage;
 public class ChatWindow extends Application {
 
 	private TextField input = new TextField();
-	private TextArea output=new TextArea(); 
-	private final static String newline = "\n";
+	private TextArea output=new TextArea();
 	String topic;
 	private Stage primaryStage;
 	String Identifiants;
@@ -83,11 +80,12 @@ public class ChatWindow extends Application {
 		btnDeco.setText("Déconnexion");
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent event) {
+			public void handle(ActionEvent event) {			
 				SignInWindow ft = new SignInWindow();
 				ft.setServer(server);
 				ft.start(primaryStage);
 				try {
+					server.removeClient(client);
 					client.removeConnectedTopic(topic);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -195,5 +193,9 @@ public class ChatWindow extends Application {
 	}
 	public void displayMsg(String msg){
 		output.appendText(msg);
+	}
+	
+	public void serverDown(){
+		
 	}
 }
