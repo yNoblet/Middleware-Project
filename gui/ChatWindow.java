@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import core.IClient;
 import core.IServer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -190,8 +191,19 @@ public class ChatWindow extends Application {
 	}
 	
 	public void serverDown(){
-		ServerConfigWindow scw = new ServerConfigWindow();
-		scw.start(primaryStage);
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Erreur");
+				alert.setHeaderText("Erreur de serveur");
+				alert.setContentText("Le serveur a été perdu!");
+				alert.showAndWait();
+	        	
+				ServerConfigWindow scw = new ServerConfigWindow();
+				scw.start(primaryStage);
+	        }
+		});
 	}
 	
 	public static void main(String[] args) {
