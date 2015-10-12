@@ -22,8 +22,6 @@ public class StartServer {
 
 	            reg.bind("Server", obj); 
 	            
-	            
-	            
 	            System.out.println("Server launched");
 	            
 	        } catch (Exception e) {

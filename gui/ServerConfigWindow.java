@@ -1,9 +1,8 @@
 package gui;
 
-import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
-import core.Client;
-import core.IClient;
 import core.IServer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -24,17 +23,22 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class SignInWindow extends Application {
-	TextField login;
-	IServer server;
-	private Stage primaryStage;
+public class ServerConfigWindow extends Application {
+	TextField ip;
+	TextField port;
+	Stage primaryStage;
+	
+	public final String IP_DEF = "localhost";
+	public final String PORT_DEF = "1097";
 	
 	@Override
 	public void start(Stage primaryStage) {
-		this.primaryStage=primaryStage;
-		login= new TextField();
 		
-		login.setOnKeyPressed(new EventHandler<KeyEvent>() {
+		this.primaryStage=primaryStage;
+		ip = new TextField(IP_DEF);
+		port = new TextField(PORT_DEF);
+		
+		ip.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.ENTER) {
@@ -51,7 +55,7 @@ public class SignInWindow extends Application {
 				onEnter();
 			}
 		});
-		
+
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
@@ -66,43 +70,64 @@ public class SignInWindow extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text scenetitle = new Text("Bienvenue");
+		Text scenetitle = new Text("Configration du serveur");
 		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(scenetitle, 1, 0, 2, 1);
+		grid.add(scenetitle, 0, 0, 2, 1);
 
-		Label userName = new Label("Identifiant:");
-		grid.add(userName, 0, 1);
-		grid.add(login, 1, 1);
-		grid.add(btn, 1, 4);
+		Label labelIP = new Label("IP serveur:");
+		grid.add(labelIP, 0, 1);
+		grid.add(ip, 1, 1);
+		Label labelPort = new Label("Port serveur:");
+		grid.add(labelPort, 0, 2);
+		grid.add(port, 1, 2);
+		grid.add(btn, 1, 3);
 
-	}
-	public void setServer(IServer s){
-		server=s;
 	}
 	
 	private void onEnter(){
-		if (login.getText().equals("")){
+		if (ip.getText().equals("") ){
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Erreur");
-			alert.setHeaderText("Erreur d'identifiant");
-			alert.setContentText("Vous n'avez pas rentré votre identifiant !");
+			alert.setHeaderText("Erreur d'adresse IP");
+			alert.setContentText("Vous n'avez pas rentré d'IP pour le serveur !");
+			alert.showAndWait();	
+		}
+		else if (port.getText().equals("") ){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Erreur");
+			alert.setHeaderText("Erreur de port");
+			alert.setContentText("Vous n'avez pas rentré de port pour le serveur !");
 			alert.showAndWait();	
 		}
 		else {
-			TopicWindow ft = new TopicWindow();
 			try {
-				IClient cl = new Client(login.getText(), server);
-				cl.setTopicWindow(ft);
-				ft.start(primaryStage);
-			} catch (RemoteException e) {
+				
+				int remotePort = Integer.parseInt(port.getText());
+				String remoteIp = ip.getText(); // ou IP si distant
+				String remoteObjectName = "Server";
+
+				Registry registry;
+			
+				registry = LocateRegistry.getRegistry(remoteIp, remotePort);
+			
+				IServer s;
+				s = (IServer) registry.lookup(remoteObjectName);
+				
+				if(s != null){
+					
+					SignInWindow sw = new SignInWindow();
+					sw.setServer(s);
+					sw.start(primaryStage);
+					
+				} else {
+					System.out.println("No server!!!");
+				}
+			} catch (Exception e) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Erreur");
 				alert.setHeaderText("Erreur de serveur");
-				alert.setContentText("Le serveur n'a pu être joint!");
-				alert.showAndWait();
-				
-				ServerConfigWindow scw = new ServerConfigWindow();
-				scw.start(primaryStage);
+				alert.setContentText("Les paramètres ne correpondent pas à un serveur valide !");
+				alert.showAndWait();	
 			}
 		}
 	}

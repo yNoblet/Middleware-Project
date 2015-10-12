@@ -37,9 +37,12 @@ public class TopicWindow extends Application {
 	Text identifiants = new Text("Bienvenue test");
 	ObservableList<String> subscribedTopics = FXCollections.observableArrayList();
 	ObservableList<String> availableTopics = FXCollections.observableArrayList();
+	private Stage primaryStage;
 
 	public void start(Stage primaryStage) throws RemoteException {
 
+		this.primaryStage=primaryStage;
+		
 		identifiants.setStyle("-fx-font-size:19px"); 
 		
 		GridPane grid = new GridPane();
@@ -56,7 +59,7 @@ public class TopicWindow extends Application {
 
 		Text TopicsIns = new Text("Sujets inscrits :");
 		Text TopicsDispos = new Text("Sujets disponibles :");
-
+		
 		Button btnNew = new Button();
 		btnNew.setText("+ Nouveau sujet");
 		btnNew.setPrefWidth(400);
@@ -80,70 +83,15 @@ public class TopicWindow extends Application {
 				btnNT.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						String title = Topic.getText();
-						if (title.equals("")){
-							Alert alert = new Alert(AlertType.ERROR);
-							alert.setTitle("Erreur");
-							alert.setHeaderText("Erreur de nom de sujet");
-							alert.setContentText("Vous n'avez pas rentré votre nom de sujet !");
-							alert.showAndWait();	
-						}
-						else {
-							try {
-								if (server.newTopic(title, client.getPseudo())){
-									dialog.close();
-									client.addSubscribedTopic(title);
-									subscribedTopics.add(title);
-									availableTopics.remove(title);
-								}
-								else{
-									Alert alert = new Alert(AlertType.ERROR);
-									alert.setTitle("Erreur");
-									alert.setHeaderText("Erreur de nom de sujet");
-									alert.setContentText("Un sujet du même nom existe déja !");
-									alert.showAndWait();	
-								}
-							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
+						onEnterNewTopic(Topic.getText(), dialog);
 					}
 				});
 				
 				Topic.setOnKeyPressed(new EventHandler<KeyEvent>() {
 					@Override
 					public void handle(KeyEvent event) {
-						if (event.getCode() == KeyCode.ENTER) {
-							String title = Topic.getText();
-							if (title.equals("")){
-								Alert alert = new Alert(AlertType.ERROR);
-								alert.setTitle("Erreur");
-								alert.setHeaderText("Erreur de nom de sujet");
-								alert.setContentText("Vous n'avez pas rentré votre nom de sujet !");
-								alert.showAndWait();	
-							}
-							else {
-								try {
-									if (server.newTopic(title, client.getPseudo())){
-										dialog.close();
-										client.addSubscribedTopic(title);
-										subscribedTopics.add(title);
-										availableTopics.remove(title);
-									}
-									else{
-										Alert alert = new Alert(AlertType.ERROR);
-										alert.setTitle("Erreur");
-										alert.setHeaderText("Erreur de nom de sujet");
-										alert.setContentText("Un sujet du même nom existe déja !");
-										alert.showAndWait();	
-									}
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-						}
+						if (event.getCode() == KeyCode.ENTER) 
+							onEnterNewTopic(Topic.getText(), dialog);
 					}
 				});
 			}
@@ -285,6 +233,7 @@ public class TopicWindow extends Application {
 	public void setSubscribedTopic(Collection<String> c){
 		subscribedTopics.addAll(c);
 	}
+	
 	public void setAvailableTopic(Collection<String> c){
 		availableTopics.addAll(c);
 	}
@@ -292,19 +241,52 @@ public class TopicWindow extends Application {
 	public void addAvailableTopic(String s){
 		availableTopics.add(s);
 	}
+	
 	public void removeTopic(String s){
 		availableTopics.remove(s);
 		subscribedTopics.remove(s);
 	}
-	
 	
 	public void setServer(IServer server) {
 		this.server = server;
 	}
 	
 	public void serverDown(){
-		
+		ServerConfigWindow scw = new ServerConfigWindow();
+		scw.start(primaryStage);
 	}
+	
+	private void onEnterNewTopic(String title, Stage dialog){
+		if (title.equals("")){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Erreur");
+			alert.setHeaderText("Erreur de nom de sujet");
+			alert.setContentText("Vous n'avez pas rentré votre nom de sujet !");
+			alert.showAndWait();	
+		}
+		else {
+			try {
+				if (server.newTopic(title, client.getPseudo())){
+					dialog.close();
+					client.addSubscribedTopic(title);
+					subscribedTopics.add(title);
+					availableTopics.remove(title);
+				}
+				else{
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Erreur");
+					alert.setHeaderText("Erreur de nom de sujet");
+					alert.setContentText("Un sujet du même nom existe déja !");
+					alert.showAndWait();	
+				}
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
 	
 	public static void main(String[] args) {
 		launch(args);

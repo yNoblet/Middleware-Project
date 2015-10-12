@@ -131,13 +131,7 @@ public class ChatWindow extends Application {
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.ENTER) {
-					try {
-						client.post(input.getText(), topic);
-						input.clear();
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					post();
 				}
 
 			}
@@ -150,13 +144,7 @@ public class ChatWindow extends Application {
 
 			@Override
 			public void handle(ActionEvent event) {
-				try {
-					client.post(input.getText(), topic);
-					input.clear();
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				post();
 			}
 
 		});	
@@ -187,15 +175,27 @@ public class ChatWindow extends Application {
 		}
 	}
 	
-	
-	public static void main(String[] args) {
-		launch(args);
+	private void post(){
+		try {
+			client.post(input.getText(), topic);
+			input.clear();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+	
 	public void displayMsg(String msg){
 		output.appendText(msg);
 	}
 	
 	public void serverDown(){
-		
+		ServerConfigWindow scw = new ServerConfigWindow();
+		scw.start(primaryStage);
 	}
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
+	
 }
