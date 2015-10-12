@@ -78,16 +78,16 @@ public class Server extends UnicastRemoteObject implements IServer {
 	public boolean newTopic(String title, String p) throws RemoteException {
 		if(topics.get(title) == null){
 			topics.put(title, new Topic(title, p));
-			//accounts.get(p).addSubscription(title);
-			System.out.println("new topic : "+title);
+			accounts.get(p).addSubscription(title);
 			for(IClient c: connectedClient){
-				c.addTopic(title);
+				if (!c.getPseudo().equals(p))
+					c.addTopic(title);
 			}
-			
 			return true;
 		}
 		return false;
 	}
+	
 	@Override
 	public ITopic getTopic(String title) throws RemoteException {
 		return topics.get(title);

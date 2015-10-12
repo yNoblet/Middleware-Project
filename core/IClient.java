@@ -9,6 +9,7 @@ import gui.TopicWindow;
 public interface IClient extends Remote {
 	public void refresh(String message) throws RemoteException;
 	public String getPseudo() throws RemoteException;
+	
 	public void addConnectedTopic(ITopic t) throws RemoteException;
 	public void removeConnectedTopic(ITopic t) throws RemoteException;
 	public void removeConnectedTopic(String topicTitle) throws RemoteException;	

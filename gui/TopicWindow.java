@@ -1,10 +1,12 @@
 package gui;
 
+
 import java.rmi.RemoteException;
 import java.util.Collection;
 
 import core.IClient;
 import core.IServer;
+import javafx.application.Platform;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -239,7 +241,12 @@ public class TopicWindow extends Application {
 	}
 	
 	public void addAvailableTopic(String s){
-		availableTopics.add(s);
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	availableTopics.add(s);
+	        }
+	   });
 	}
 	
 	public void removeTopic(String s){
@@ -268,7 +275,6 @@ public class TopicWindow extends Application {
 			try {
 				if (server.newTopic(title, client.getPseudo())){
 					dialog.close();
-					client.addSubscribedTopic(title);
 					subscribedTopics.add(title);
 					availableTopics.remove(title);
 				}
