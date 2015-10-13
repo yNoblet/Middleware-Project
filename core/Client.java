@@ -10,7 +10,7 @@ import gui.TopicWindow;
 
 public class Client extends UnicastRemoteObject implements IClient {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5697099462906475057L;
 	private String pseudo;
@@ -19,19 +19,19 @@ public class Client extends UnicastRemoteObject implements IClient {
 	IAccount account;
 	ChatWindow cw;
 	TopicWindow tw;
- 	
+
 	public Client(String p, IServer s) throws RemoteException {
 		super();
-		this.pseudo = p;
+		pseudo = p;
 		connectedTopics = new ArrayList<ITopic>();
 		server = s;
 		server.getTopicTitles();
 		server.addClient(this);
-		
-		account = (IAccount) s.getAccount(p);
-		
+
+		account = s.getAccount(p);
+
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -42,7 +42,8 @@ public class Client extends UnicastRemoteObject implements IClient {
 			}
 		}));
 	}
-	
+
+	@Override
 	public String getPseudo() throws RemoteException {
 		return pseudo;
 	}
@@ -56,8 +57,8 @@ public class Client extends UnicastRemoteObject implements IClient {
 		cw.displayMsg(message);
 	}
 
-	private void onDisconnect() throws RemoteException{
-		for (ITopic t: connectedTopics){
+	private void onDisconnect() throws RemoteException {
+		for (ITopic t : connectedTopics) {
 			t.disconnectClient(this);
 		}
 		server.removeClient(this);
@@ -80,7 +81,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 
 	@Override
 	public void setChatWindow(ChatWindow cw, String topicTitle) throws RemoteException {
-		this.cw=cw;
+		this.cw = cw;
 		cw.setIdentifiants(pseudo);
 		cw.setServer(server);
 		cw.setClient(this);
@@ -90,7 +91,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 
 	@Override
 	public void setTopicWindow(TopicWindow tw) throws RemoteException {
-		this.tw =tw;
+		this.tw = tw;
 		tw.setPseudo(pseudo);
 		tw.setClient(this);
 		tw.setServer(server);
@@ -117,15 +118,17 @@ public class Client extends UnicastRemoteObject implements IClient {
 
 	@Override
 	public void addTopic(String t) throws RemoteException {
-		if (tw!=null)
+		if (tw != null) {
 			tw.addAvailableTopic(t);
+		}
 	}
 
 	@Override
 	public void removeTopic(String t) throws RemoteException {
-		if (tw != null)
+		if (tw != null) {
 			tw.removeTopic(t);
-		if (cw!=null && cw.getTopic()==t){
+		}
+		if (cw != null && cw.getTopic() == t) {
 			cw.onDeleteTopic();
 		}
 	}
@@ -133,10 +136,12 @@ public class Client extends UnicastRemoteObject implements IClient {
 	@Override
 	public void serverDown() throws Exception {
 		System.out.println("Server down => exit");
-		if (cw!=null)
+		if (cw != null) {
 			cw.serverDown();
-		if (tw!= null)
+		}
+		if (tw != null) {
 			tw.serverDown();
+		}
 	}
 
 }

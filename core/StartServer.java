@@ -22,7 +22,7 @@ public class StartServer {
 	            
 	            Registry reg = java.rmi.registry.LocateRegistry.createRegistry(1097);
 
-	            reg.bind("Server", obj); 
+	            reg.bind("Server", obj);
 	            
 	            System.out.println("Server launched");
 	            
