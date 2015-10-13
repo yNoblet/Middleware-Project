@@ -51,16 +51,16 @@ public class TopicWindow extends Application {
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(0);
 		grid.setVgap(0);
-		grid.setPadding(new Insets(0, 0, 0, 0));
+		grid.setPadding(new Insets(5, 5, 5, 5));
 
-		Scene scene = new Scene(grid, 400, 500);
+		Scene scene = new Scene(grid, 425, 505);
 		primaryStage.setTitle("Forum de discussion");
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text TopicsIns = new Text("Sujets inscrits :");
-		Text TopicsDispos = new Text("Sujets disponibles :");
+		Text topicsIns = new Text("Sujets inscrits :");
+		Text topicsDispos = new Text("Sujets disponibles :");
 		
 		Button btnNew = new Button();
 		btnNew.setText("+ Nouveau sujet");
@@ -118,8 +118,8 @@ public class TopicWindow extends Application {
 		});
 
 
-		ListView<String> ListInscrits = new ListView<String>();
-		ListInscrits.setItems(subscribedTopics);
+		ListView<String> listInscrits = new ListView<String>();
+		listInscrits.setItems(subscribedTopics);
 		
 
 		Button btnGo = new Button();
@@ -130,7 +130,7 @@ public class TopicWindow extends Application {
 			public void handle(ActionEvent event) {
 				ChatWindow cw = new ChatWindow();
 				try {
-					client.setChatWindow(cw, ListInscrits.getSelectionModel().getSelectedItem());
+					client.setChatWindow(cw, listInscrits.getSelectionModel().getSelectedItem());
 					cw.start(primaryStage);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -151,7 +151,7 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					String title = ListInscrits.getSelectionModel().getSelectedItem();
+					String title = listInscrits.getSelectionModel().getSelectedItem();
 					client.removeSubscribedTopic(title);
 					subscribedTopics.remove(title);
 					availableTopics.add(title);
@@ -166,22 +166,26 @@ public class TopicWindow extends Application {
 			}
 		});
 		
-		ListInscrits.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		Button btnSuppr = new Button();
+		btnSuppr.setText("Détruire");
+		btnSuppr.setDisable(true);
+		
+		listInscrits.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				btnGo.setDisable(newValue==null);
 				btnDes.setDisable(newValue==null);
 			}
 		});
 
-		ListView<String> ListDispo = new ListView<String>();
-		ListDispo.setItems(availableTopics);
+		ListView<String> listDispo = new ListView<String>();
+		listDispo.setItems(availableTopics);
 
 		btnInscri.setOnAction(
 				new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
 						try {
-							String title = ListDispo.getSelectionModel().getSelectedItem();
+							String title = listDispo.getSelectionModel().getSelectedItem();
 							client.addSubscribedTopic(title);
 							subscribedTopics.add(title);
 							availableTopics.remove(title);
@@ -195,31 +199,34 @@ public class TopicWindow extends Application {
 					}
 				});
 		
-		ListDispo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		listDispo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				btnInscri.setDisable(newValue==null);
 			}
 		});
 		
-		HBox vbButtons = new HBox();
-		//vbButtons.setStyle("-fx-background-color: #336699;");
-		vbButtons.setPrefWidth(400);
-		vbButtons.setPadding(new Insets(0, 0, 2, 3));
-		identifiants.setWrappingWidth(292);
-		vbButtons.getChildren().addAll(identifiants,btnDeco);
-		HBox InsButtons = new HBox();
-		InsButtons.setSpacing(10);
-		InsButtons.getChildren().addAll(btnGo,btnDes);
-
-
-		grid.add(vbButtons, 0,0);
-		grid.add(btnNew, 0, 1);
-		grid.add(TopicsIns, 0,2);
-		grid.add(ListInscrits, 0,3);
-		grid.add(InsButtons, 0,4);
-		grid.add(TopicsDispos, 0,5);
-	    grid.add(ListDispo, 0,6);
-	    grid.add(btnInscri, 0,7);
+		identifiants.setWrappingWidth(400);
+		btnNew.setPrefWidth(420);
+		HBox hb = new HBox();
+		hb.setPrefWidth(100);
+		btnDeco.setPrefWidth(110);
+		btnGo.setPrefWidth(100);
+		btnSuppr.setPrefWidth(100);
+		btnInscri.setPrefWidth(100);
+		btnSuppr.setPrefWidth(110);
+		
+		grid.add(identifiants, 0, 0, 2, 1);
+		grid.add(hb, 2, 0, 1, 1);
+		grid.add(btnDeco, 3, 0, 1, 1);
+		grid.add(btnNew, 0, 1, 4, 1);
+		grid.add(topicsIns, 0, 2, 2, 1);
+		grid.add(listInscrits, 0, 3, 4, 2);
+		grid.add(btnGo, 0, 5, 1, 1);
+		grid.add(btnDes, 1, 5, 1, 1);
+		grid.add(btnSuppr, 3, 5, 1, 1);
+		grid.add(topicsDispos, 0, 6, 2, 1);
+	    grid.add(listDispo, 0, 7, 4, 2);
+	    grid.add(btnInscri, 0, 9, 1, 1);
 
 	}
 	public void setClient(IClient cl) {

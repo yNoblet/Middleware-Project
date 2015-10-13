@@ -59,14 +59,14 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public IAccount getAccount(String cl) throws RemoteException {
+	public synchronized IAccount getAccount(String cl) throws RemoteException {
 		if(accounts.get(cl) == null){
 			accounts.put(cl, new Account(cl));
 		}
 		return accounts.get(cl);
 	}
 	@Override
-	public ArrayList<String> getTopicTitles() throws RemoteException {
+	public synchronized ArrayList<String> getTopicTitles() throws RemoteException {
 		//String s=topics.keySet().toString();
 		//s = s.substring(1,s.length()-1);
 		ArrayList<String> l = new ArrayList<String>();
@@ -75,7 +75,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public boolean newTopic(String title, String p) throws RemoteException {
+	public synchronized boolean newTopic(String title, String p) throws RemoteException {
 		if(topics.get(title) == null){
 			topics.put(title, new Topic(title, p));
 			accounts.get(p).addSubscription(title);
@@ -89,12 +89,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public ITopic getTopic(String title) throws RemoteException {
+	public synchronized ITopic getTopic(String title) throws RemoteException {
 		return topics.get(title);
 	}
 
 	@Override
-	public boolean delTopic(String title, String p) throws RemoteException {
+	public synchronized boolean delTopic(String title, String p) throws RemoteException {
 		topics.remove(title);
 		for(IClient c: connectedClient){
 			c.removeTopic(title);
@@ -103,12 +103,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 
 	@Override
-	public void addClient(IClient cl) throws RemoteException {
+	public synchronized void addClient(IClient cl) throws RemoteException {
 		connectedClient.add(cl);
 	}
 
 	@Override
-	public void removeClient(IClient cl) throws RemoteException {
+	public synchronized void removeClient(IClient cl) throws RemoteException {
 		connectedClient.remove(cl);
 	}
 	

@@ -70,7 +70,7 @@ public class ServerConfigWindow extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text scenetitle = new Text("Configration du serveur");
+		Text scenetitle = new Text("Configuration du serveur");
 		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		grid.add(scenetitle, 0, 0, 2, 1);
 

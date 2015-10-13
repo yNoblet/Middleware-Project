@@ -7,6 +7,7 @@ public class StartServer {
 		 try {
 	            IServer obj = new Server();
 	            
+	            /*
 	            IAccount a = obj.getAccount("author1");
 	            IAccount b = obj.getAccount("A");
 	           
@@ -17,6 +18,7 @@ public class StartServer {
 	           
 	            b.addSubscription("b");
 	            b.addSubscription("c");
+	            */
 	            
 	            Registry reg = java.rmi.registry.LocateRegistry.createRegistry(1097);
 
