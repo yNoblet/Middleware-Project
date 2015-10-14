@@ -85,7 +85,9 @@ public class TopicWindow extends Application {
 				if (event.getCode() == KeyCode.ADD || event.getCode() == KeyCode.PLUS) {
 					createNewTopic();
 				} else if (event.getCode() == KeyCode.DELETE) {
-					deleteTopic(listeInscrits, btnGo, btnDes, btnSuppr);
+					if (listeInscrits.getSelectionModel().getSelectedItem() != null && listeInscrits.isFocused()) {
+						deleteTopic(listeInscrits, btnGo, btnDes, btnSuppr);
+					}
 				}
 			}
 		});
@@ -321,27 +323,59 @@ public class TopicWindow extends Application {
 	}
 
 	private void deleteTopic(ListView<String> listeInscrits, Button btnGo, Button btnDes, Button btnSuppr) {
-		try {
-			// AJOUTER FENETRE CONFIRMATION
-			String title = listeInscrits.getSelectionModel().getSelectedItem();
-			if (server.getTopic(title).getAuthor().equals(client.getPseudo())) {
-				server.deleteTopic(title);
-				if (subscribedTopics.isEmpty()) {
-					btnGo.setDisable(true);
-					btnDes.setDisable(true);
-					btnSuppr.setDisable(true);
+		final Stage dialog = new Stage();
+		GridPane grid = new GridPane();
+		grid.setAlignment(Pos.CENTER);
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 20, 20, 20));
+		Scene scene = new Scene(grid, 350, 100);
+		dialog.setTitle("Destruction d'un sujet");
+		dialog.setScene(scene);
+		dialog.setResizable(false);
+		dialog.show();
+		Text question = new Text("Êtes-vous sûr de vouloir supprimer ce sujet ?");
+		Button btnYes = new Button();
+		btnYes.setText("Oui");
+		Button btnNo = new Button();
+		btnNo.setText("Non");
+		grid.add(question, 1, 0, 2, 1);
+		grid.add(btnYes, 3, 1, 1, 1);
+		grid.add(btnNo, 4, 1, 1, 1);
+
+		btnYes.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				try {
+					String title = listeInscrits.getSelectionModel().getSelectedItem();
+					if (server.getTopic(title).getAuthor().equals(client.getPseudo())) {
+						server.deleteTopic(title);
+						if (subscribedTopics.isEmpty()) {
+							btnGo.setDisable(true);
+							btnDes.setDisable(true);
+							btnSuppr.setDisable(true);
+						}
+					} else {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Erreur");
+						alert.setHeaderText("Erreur de permission");
+						alert.setContentText("Seul l'auteur d'un sujet a le droit de le détruire.");
+						alert.showAndWait();
+					}
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			} else {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Erreur");
-				alert.setHeaderText("Erreur de permission");
-				alert.setContentText("Seul l'auteur d'un sujet a le droit de le détruire.");
-				alert.showAndWait();
+				dialog.close();
 			}
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		});
+
+		btnNo.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				dialog.close();
+			}
+		});
 	}
 
 	private void onEnterNewTopic(String title, Stage dialog) {
