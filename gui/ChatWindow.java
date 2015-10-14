@@ -12,10 +12,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -24,12 +24,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-
-
 public class ChatWindow extends Application {
 
 	private TextField input = new TextField();
-	private TextArea output=new TextArea();
+	private TextArea output = new TextArea();
 	String topic;
 	private Stage primaryStage;
 	String Identifiants;
@@ -39,7 +37,8 @@ public class ChatWindow extends Application {
 	public void setClient(IClient client) {
 		this.client = client;
 	}
-    public String getTopic() {
+
+	public String getTopic() {
 		return topic;
 	}
 
@@ -47,17 +46,15 @@ public class ChatWindow extends Application {
 		this.server = server;
 	}
 
-
 	public void setTopic(String topic) {
 		this.topic = topic;
 	}
-
 
 	public void setIdentifiants(String identifiants) {
 		Identifiants = identifiants;
 	}
 
-
+	@Override
 	public void start(Stage primaryStage) {
 
 		GridPane grid = new GridPane();
@@ -66,22 +63,21 @@ public class ChatWindow extends Application {
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
 		Scene scene = new Scene(grid, 750, 300);
-		
-		this.primaryStage=primaryStage;
+
+		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Forum de discussion");
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text scenetitle = new Text("Topic "+ topic + " :");
-		Text identifiants = new Text("Bienvenue "+ Identifiants +" !");
-		
-		
+		Text scenetitle = new Text("Topic " + topic + " :");
+		Text identifiants = new Text("Bienvenue " + Identifiants + " !");
+
 		Button btnDeco = new Button();
 		btnDeco.setText("Déconnexion");
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent event) {			
+			public void handle(ActionEvent event) {
 				SignInWindow ft = new SignInWindow();
 				ft.setServer(server);
 				ft.start(primaryStage);
@@ -98,7 +94,7 @@ public class ChatWindow extends Application {
 
 		Button btnR = new Button();
 		btnR.setText("Retour");
-		grid.add(btnR, 1,1);
+		grid.add(btnR, 1, 1);
 		btnR.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -114,15 +110,13 @@ public class ChatWindow extends Application {
 				}
 			}
 		});
-		
-		
+
 		HBox hbButtons = new HBox();
 		hbButtons.getChildren().addAll(identifiants);
 		VBox vbButtons = new VBox();
 		vbButtons.setSpacing(5);
-		vbButtons.getChildren().addAll(btnDeco,btnR);
-		
-		
+		vbButtons.getChildren().addAll(btnDeco, btnR);
+
 		output.setEditable(false);
 		output.setStyle("-fx-border-style: none");
 		output.setFocusTraversable(false);
@@ -137,7 +131,6 @@ public class ChatWindow extends Application {
 
 			}
 		});
-		
 
 		Button btn = new Button();
 		btn.setText("Valider");
@@ -148,35 +141,42 @@ public class ChatWindow extends Application {
 				post();
 			}
 
-		});	
-		
-		grid.add(scenetitle, 0,1);
-		grid.add(hbButtons, 0,0);
-		grid.add(vbButtons, 1,0);
-		grid.add(output, 0,2);
-		grid.add(input,0,3);
-		grid.add(btn, 1,3);	
+		});
+
+		grid.add(scenetitle, 0, 1);
+		grid.add(hbButtons, 0, 0);
+		grid.add(vbButtons, 1, 0);
+		grid.add(output, 0, 2);
+		grid.add(input, 0, 3);
+		grid.add(btn, 1, 3);
 	}
-	
-	public void onDeleteTopic(){
-		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle("Erreur");
-		alert.setHeaderText("Sujet Supprimé");
-		alert.setContentText("Le sujet a été supprimé par un autre utilisateur !\nRetour sur la page précédente.");
-		alert.showAndWait();
-		TopicWindow ft = new TopicWindow();
-		try {
-			client.removeConnectedTopic(topic);
-			client.setTopicWindow(ft);
-			ft.start(primaryStage);
-			System.out.println("Go back");
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+	public void onDeleteTopic() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Erreur");
+				alert.setHeaderText("Sujet Supprimé");
+				alert.setContentText(
+						"Le sujet a été supprimé par un autre utilisateur !\nRetour sur la page précédente.");
+				alert.showAndWait();
+				System.out.println("c");
+				TopicWindow ft = new TopicWindow();
+				try {
+					client.removeConnectedTopic(topic);
+					client.setTopicWindow(ft);
+					ft.start(primaryStage);
+					System.out.println("Go back");
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
-	
-	private void post(){
+
+	private void post() {
 		try {
 			client.post(input.getText(), topic);
 			input.clear();
@@ -185,29 +185,29 @@ public class ChatWindow extends Application {
 			e.printStackTrace();
 		}
 	}
-	
-	public void displayMsg(String msg){
+
+	public void displayMsg(String msg) {
 		output.appendText(msg);
 	}
-	
-	public void serverDown(){
+
+	public void serverDown() {
 		Platform.runLater(new Runnable() {
-	        @Override
-	        public void run() {
-	        	Alert alert = new Alert(AlertType.ERROR);
+			@Override
+			public void run() {
+				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Erreur");
 				alert.setHeaderText("Erreur de serveur");
 				alert.setContentText("Le serveur a été perdu!");
 				alert.showAndWait();
-	        	
+
 				ServerConfigWindow scw = new ServerConfigWindow();
 				scw.start(primaryStage);
-	        }
+			}
 		});
 	}
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
+
 }

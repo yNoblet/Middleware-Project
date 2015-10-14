@@ -104,10 +104,10 @@ public class Server extends UnicastRemoteObject implements IServer {
 		for (String client : t.getClientList()) {
 			accounts.get(client).removeSubscription(title);
 		}
+		topics.remove(title);
 		for (IClient c : connectedClient) {
 			c.removeTopic(title);
 		}
-		topics.remove(title);
 		return true;
 	}
 

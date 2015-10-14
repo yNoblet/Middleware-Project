@@ -61,11 +61,31 @@ public class TopicWindow extends Application {
 		Text topicsIns = new Text("Sujets inscrits :");
 		Text topicsDispos = new Text("Sujets disponibles :");
 
+		ListView<String> listeInscrits = new ListView<String>();
+		listeInscrits.setItems(subscribedTopics);
+		ListView<String> listDispo = new ListView<String>();
+		listDispo.setItems(availableTopics);
+
+		/* Creation des boutons pour les sujets inscrits */
+		Button btnGo = new Button();
+		btnGo.setText("Aller");
+		btnGo.setDisable(true);
+
+		Button btnDes = new Button();
+		btnDes.setText("Se désinscrire");
+		btnDes.setDisable(true);
+
+		Button btnSuppr = new Button();
+		btnSuppr.setText("Détruire");
+		btnSuppr.setDisable(true);
+
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.ADD || event.getCode() == KeyCode.PLUS) {
-					newTopic();
+					createNewTopic();
+				} else if (event.getCode() == KeyCode.DELETE) {
+					deleteTopic(listeInscrits, btnGo, btnDes, btnSuppr);
 				}
 			}
 		});
@@ -76,7 +96,7 @@ public class TopicWindow extends Application {
 		btnNew.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				newTopic();
+				createNewTopic();
 			}
 		});
 
@@ -97,31 +117,13 @@ public class TopicWindow extends Application {
 			}
 		});
 
-		ListView<String> listInscrits = new ListView<String>();
-		listInscrits.setItems(subscribedTopics);
-		ListView<String> listDispo = new ListView<String>();
-		listDispo.setItems(availableTopics);
-
-		/* Creation des boutons pour les sujets inscrits */
-		Button btnGo = new Button();
-		btnGo.setText("Aller");
-		btnGo.setDisable(true);
-
-		Button btnDes = new Button();
-		btnDes.setText("Se désinscrire");
-		btnDes.setDisable(true);
-
-		Button btnSuppr = new Button();
-		btnSuppr.setText("Détruire");
-		btnSuppr.setDisable(true);
-
 		/* Definition des evenements associés pour chacun des boutons */
 		btnGo.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				ChatWindow cw = new ChatWindow();
 				try {
-					client.setChatWindow(cw, listInscrits.getSelectionModel().getSelectedItem());
+					client.setChatWindow(cw, listeInscrits.getSelectionModel().getSelectedItem());
 					cw.start(primaryStage);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -134,7 +136,7 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					String title = listInscrits.getSelectionModel().getSelectedItem();
+					String title = listeInscrits.getSelectionModel().getSelectedItem();
 					client.removeSubscribedTopic(title);
 					server.getTopic(title).unsubscribe((client.getPseudo()));
 					subscribedTopics.remove(title);
@@ -154,32 +156,12 @@ public class TopicWindow extends Application {
 		btnSuppr.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				try {
-					// AJOUTER FENETRE CONFIRMATION
-					String title = listInscrits.getSelectionModel().getSelectedItem();
-					if (server.getTopic(title).getAuthor().equals(client.getPseudo())) {
-						server.deleteTopic(title);
-						if (subscribedTopics.isEmpty()) {
-							btnGo.setDisable(true);
-							btnDes.setDisable(true);
-							btnSuppr.setDisable(true);
-						}
-					} else {
-						Alert alert = new Alert(AlertType.ERROR);
-						alert.setTitle("Erreur");
-						alert.setHeaderText("Erreur de permission");
-						alert.setContentText("Seul l'auteur d'un sujet a le droit de le détruire.");
-						alert.showAndWait();
-					}
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				deleteTopic(listeInscrits, btnGo, btnDes, btnSuppr);
 			}
 		});
 
 		/**/
-		listInscrits.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		listeInscrits.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				btnGo.setDisable(newValue == null);
@@ -238,7 +220,7 @@ public class TopicWindow extends Application {
 		grid.add(btnDeco, 3, 0, 1, 1);
 		grid.add(btnNew, 0, 1, 4, 1);
 		grid.add(topicsIns, 0, 2, 2, 1);
-		grid.add(listInscrits, 0, 3, 4, 2);
+		grid.add(listeInscrits, 0, 3, 4, 2);
 		grid.add(btnGo, 0, 5, 1, 1);
 		grid.add(btnDes, 1, 5, 1, 1);
 		grid.add(btnSuppr, 3, 5, 1, 1);
@@ -306,7 +288,7 @@ public class TopicWindow extends Application {
 		});
 	}
 
-	private void newTopic() {
+	private void createNewTopic() {
 		final Stage dialog = new Stage();
 		dialog.initModality(Modality.APPLICATION_MODAL);
 		dialog.initOwner(primaryStage);
@@ -336,6 +318,30 @@ public class TopicWindow extends Application {
 				}
 			}
 		});
+	}
+
+	private void deleteTopic(ListView<String> listeInscrits, Button btnGo, Button btnDes, Button btnSuppr) {
+		try {
+			// AJOUTER FENETRE CONFIRMATION
+			String title = listeInscrits.getSelectionModel().getSelectedItem();
+			if (server.getTopic(title).getAuthor().equals(client.getPseudo())) {
+				server.deleteTopic(title);
+				if (subscribedTopics.isEmpty()) {
+					btnGo.setDisable(true);
+					btnDes.setDisable(true);
+					btnSuppr.setDisable(true);
+				}
+			} else {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Erreur");
+				alert.setHeaderText("Erreur de permission");
+				alert.setContentText("Seul l'auteur d'un sujet a le droit de le détruire.");
+				alert.showAndWait();
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void onEnterNewTopic(String title, Stage dialog) {
