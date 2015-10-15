@@ -2,7 +2,7 @@ package core;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Set;
+import java.util.Map;
 
 public interface ITopic extends Remote {
 	public void subscribe(String pseudo) throws RemoteException;
@@ -17,7 +17,11 @@ public interface ITopic extends Remote {
 
 	public String getAuthor() throws RemoteException;
 
-	public Set<String> getClientList() throws RemoteException;
+	public String getDate() throws RemoteException;
+
+	public Map<String, Integer> getClientList() throws RemoteException;
 
 	public String getTitle() throws RemoteException;
+
+	public void addNbMsg(String client) throws RemoteException;
 }

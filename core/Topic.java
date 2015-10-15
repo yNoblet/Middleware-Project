@@ -2,8 +2,13 @@ package core;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Topic extends UnicastRemoteObject implements ITopic {
@@ -14,10 +19,13 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	private static final long serialVersionUID = -3180799191650643596L;
 	private String title;
 	private String author;
-	private Set<String> clientList;
+	// private Set<String> clientList;
+	private Map<String, Integer> clientList;
 	private ArrayList<Message> historic;
 	private Set<IClient> connectedClients;
+	private String date;
 
+	@Override
 	public String getTitle() {
 		return title;
 	}
@@ -35,11 +43,12 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		this.author = author;
 	}
 
-	public Set<String> getClientList() {
+	@Override
+	public Map<String, Integer> getClientList() {
 		return clientList;
 	}
 
-	public void setClientList(Set<String> client_list) {
+	public void setClientList(Map<String, Integer> client_list) {
 		clientList = client_list;
 	}
 
@@ -55,10 +64,14 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		super();
 		this.title = title;
 		this.author = author;
-		clientList = new HashSet<String>();
-		clientList.add(author);
+		// clientList = new HashSet<String>();
+		clientList = new HashMap<String, Integer>();
+		clientList.put(author, 0);
 		historic = new ArrayList<Message>();
 		connectedClients = new HashSet<IClient>();
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy à HH:mm:ss");
+		Date d = new Date();
+		date = dateFormat.format(d);
 	}
 
 	public String getHistoricString() {
@@ -71,7 +84,7 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 
 	@Override
 	public void subscribe(String pseudo) throws RemoteException {
-		clientList.add(pseudo);
+		clientList.put(pseudo, 0);
 	}
 
 	@Override
@@ -103,5 +116,15 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		for (IClient c : connectedClients) {
 			c.refresh(msg);
 		}
+	}
+
+	@Override
+	public void addNbMsg(String client) throws RemoteException {
+		getClientList().replace(client, getClientList().get(client) + 1);
+	}
+
+	@Override
+	public String getDate() throws RemoteException {
+		return date;
 	}
 }

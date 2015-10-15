@@ -61,23 +61,23 @@ public class TopicWindow extends Application {
 		Text topicsIns = new Text("Sujets inscrits :");
 		Text topicsDispos = new Text("Sujets disponibles :");
 
-		ListView<String> listeInscrits = new ListView<String>();
-		listeInscrits.setItems(subscribedTopics);
-		ListView<String> listDispo = new ListView<String>();
-		listDispo.setItems(availableTopics);
+		ListView<String> listSubscribed = new ListView<String>();
+		listSubscribed.setItems(subscribedTopics);
+		ListView<String> listAvailables = new ListView<String>();
+		listAvailables.setItems(availableTopics);
 
 		/* Creation des boutons pour les sujets inscrits */
 		Button btnGo = new Button();
 		btnGo.setText("Aller");
 		btnGo.setDisable(true);
 
-		Button btnDes = new Button();
-		btnDes.setText("Se désinscrire");
-		btnDes.setDisable(true);
+		Button btnUnsub = new Button();
+		btnUnsub.setText("Se désinscrire");
+		btnUnsub.setDisable(true);
 
-		Button btnSuppr = new Button();
-		btnSuppr.setText("Détruire");
-		btnSuppr.setDisable(true);
+		Button btnDelete = new Button();
+		btnDelete.setText("Détruire");
+		btnDelete.setDisable(true);
 
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
@@ -85,8 +85,8 @@ public class TopicWindow extends Application {
 				if (event.getCode() == KeyCode.ADD || event.getCode() == KeyCode.PLUS) {
 					createNewTopic();
 				} else if (event.getCode() == KeyCode.DELETE) {
-					if (listeInscrits.getSelectionModel().getSelectedItem() != null && listeInscrits.isFocused()) {
-						deleteTopic(listeInscrits, btnGo, btnDes, btnSuppr);
+					if (listSubscribed.getSelectionModel().getSelectedItem() != null && listSubscribed.isFocused()) {
+						deleteTopic(listSubscribed, btnGo, btnUnsub, btnDelete);
 					}
 				}
 			}
@@ -125,7 +125,7 @@ public class TopicWindow extends Application {
 			public void handle(ActionEvent event) {
 				ChatWindow cw = new ChatWindow();
 				try {
-					client.setChatWindow(cw, listeInscrits.getSelectionModel().getSelectedItem());
+					client.setChatWindow(cw, listSubscribed.getSelectionModel().getSelectedItem());
 					cw.start(primaryStage);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -134,19 +134,19 @@ public class TopicWindow extends Application {
 			}
 		});
 
-		btnDes.setOnAction(new EventHandler<ActionEvent>() {
+		btnUnsub.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					String title = listeInscrits.getSelectionModel().getSelectedItem();
+					String title = listSubscribed.getSelectionModel().getSelectedItem();
 					client.removeSubscribedTopic(title);
 					server.getTopic(title).unsubscribe((client.getPseudo()));
 					subscribedTopics.remove(title);
 					availableTopics.add(title);
 					if (subscribedTopics.isEmpty()) {
 						btnGo.setDisable(true);
-						btnDes.setDisable(true);
-						btnSuppr.setDisable(true);
+						btnUnsub.setDisable(true);
+						btnDelete.setDisable(true);
 					}
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -155,25 +155,46 @@ public class TopicWindow extends Application {
 			}
 		});
 
-		btnSuppr.setOnAction(new EventHandler<ActionEvent>() {
+		btnDelete.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				deleteTopic(listeInscrits, btnGo, btnDes, btnSuppr);
+				deleteTopic(listSubscribed, btnGo, btnUnsub, btnDelete);
+			}
+		});
+
+		Button btnInscri = new Button();
+
+		listSubscribed.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (listAvailables.getSelectionModel().getSelectedItem() != null) {
+					btnInscri.setDisable(newValue);
+				}
+			}
+		});
+		listAvailables.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (listSubscribed.getSelectionModel().getSelectedItem() != null) {
+					btnGo.setDisable(newValue);
+					btnUnsub.setDisable(newValue);
+					btnDelete.setDisable(newValue);
+				}
 			}
 		});
 
 		/**/
-		listeInscrits.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		listSubscribed.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				btnGo.setDisable(newValue == null);
-				btnDes.setDisable(newValue == null);
-				btnSuppr.setDisable(newValue == null);
+				btnUnsub.setDisable(newValue == null);
+				btnDelete.setDisable(newValue == null);
+
 			}
 		});
 
 		/* Creation des boutons pour les sujets non-inscrits */
-		Button btnInscri = new Button();
 		btnInscri.setText("S'inscrire");
 		btnInscri.setDisable(true);
 
@@ -182,7 +203,7 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					String title = listDispo.getSelectionModel().getSelectedItem();
+					String title = listAvailables.getSelectionModel().getSelectedItem();
 					client.addSubscribedTopic(title);
 					server.getTopic(title).subscribe(client.getPseudo());
 					subscribedTopics.add(title);
@@ -198,7 +219,7 @@ public class TopicWindow extends Application {
 			}
 		});
 
-		listDispo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		listAvailables.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				btnInscri.setDisable(newValue == null);
@@ -212,9 +233,9 @@ public class TopicWindow extends Application {
 		hb.setPrefWidth(100);
 		btnDeco.setPrefWidth(110);
 		btnGo.setPrefWidth(100);
-		btnSuppr.setPrefWidth(100);
+		btnDelete.setPrefWidth(100);
 		btnInscri.setPrefWidth(100);
-		btnSuppr.setPrefWidth(110);
+		btnDelete.setPrefWidth(110);
 
 		/* Positionnement des éléments dans la grille/fenêtre principale */
 		grid.add(identifiants, 0, 0, 2, 1);
@@ -222,12 +243,12 @@ public class TopicWindow extends Application {
 		grid.add(btnDeco, 3, 0, 1, 1);
 		grid.add(btnNew, 0, 1, 4, 1);
 		grid.add(topicsIns, 0, 2, 2, 1);
-		grid.add(listeInscrits, 0, 3, 4, 2);
+		grid.add(listSubscribed, 0, 3, 4, 2);
 		grid.add(btnGo, 0, 5, 1, 1);
-		grid.add(btnDes, 1, 5, 1, 1);
-		grid.add(btnSuppr, 3, 5, 1, 1);
+		grid.add(btnUnsub, 1, 5, 1, 1);
+		grid.add(btnDelete, 3, 5, 1, 1);
 		grid.add(topicsDispos, 0, 6, 2, 1);
-		grid.add(listDispo, 0, 7, 4, 2);
+		grid.add(listAvailables, 0, 7, 4, 2);
 		grid.add(btnInscri, 0, 9, 1, 1);
 
 	}

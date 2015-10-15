@@ -129,9 +129,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 			tw.removeTopic(t);
 		}
 		if (cw != null && cw.getTopic().equals(t)) {
-			System.out.println("a");
 			cw.onDeleteTopic();
-			System.out.println("b");
 		}
 	}
 

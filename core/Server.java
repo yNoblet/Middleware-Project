@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Server extends UnicastRemoteObject implements IServer {
 	/**
@@ -101,9 +102,14 @@ public class Server extends UnicastRemoteObject implements IServer {
 	@Override
 	public synchronized boolean deleteTopic(String title) throws RemoteException {
 		Topic t = topics.get(title);
-		for (String client : t.getClientList()) {
-			accounts.get(client).removeSubscription(title);
+		/*
+		 * for (String client : t.getClientList()) {
+		 * accounts.get(client).removeSubscription(title); }
+		 */
+		for (Entry<String, Integer> entry : t.getClientList().entrySet()) {
+			accounts.get(entry.getKey()).removeSubscription(title);
 		}
+
 		topics.remove(title);
 		for (IClient c : connectedClient) {
 			c.removeTopic(title);

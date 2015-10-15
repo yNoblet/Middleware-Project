@@ -10,6 +10,7 @@ public class Account extends UnicastRemoteObject implements IAccount {
 	 */
 	private static final long serialVersionUID = 3768006366498340145L;
 	private String pseudo;
+	private int nbMsg;
 	private ArrayList<String> subscriptionList;
 
 	public Account(String p) throws RemoteException {
@@ -41,5 +42,15 @@ public class Account extends UnicastRemoteObject implements IAccount {
 	@Override
 	public ArrayList<String> getSubscriptionList() throws RemoteException {
 		return subscriptionList;
+	}
+
+	@Override
+	public int getNbMsg() {
+		return nbMsg;
+	}
+
+	@Override
+	public void addNbMsg(int nbMsg) {
+		this.nbMsg++;
 	}
 }

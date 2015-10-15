@@ -19,8 +19,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -28,9 +26,10 @@ public class ChatWindow extends Application {
 
 	private TextField input = new TextField();
 	private TextArea output = new TextArea();
+	private Text account = new Text();
 	String topic;
 	private Stage primaryStage;
-	String Identifiants;
+	String identifiants;
 	IServer server;
 	IClient client;
 
@@ -50,19 +49,19 @@ public class ChatWindow extends Application {
 		this.topic = topic;
 	}
 
-	public void setIdentifiants(String identifiants) {
-		Identifiants = identifiants;
+	public void setIdentifiants(String id) {
+		identifiants = id;
 	}
 
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage primaryStage) throws RemoteException {
 
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
-		Scene scene = new Scene(grid, 750, 300);
+		Scene scene = new Scene(grid, 750, 400);
 
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Forum de discussion");
@@ -70,9 +69,21 @@ public class ChatWindow extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text scenetitle = new Text("Topic " + topic + " :");
-		Text identifiants = new Text("Bienvenue " + Identifiants + " !");
+		Text id = new Text("Bienvenue " + identifiants + " !");
+		Text scenetitle = new Text("Sujet : " + topic);
+		Text infoText = new Text("créé par " + " le");
 
+		try {
+			infoText.setText(
+					"créé par " + server.getTopic(topic).getAuthor() + "\nle " + server.getTopic(topic).getDate());
+			account.setText(
+					identifiants + "\n" + server.getAccount(identifiants).getNbMsg() + " message(s) au total dont "
+							+ server.getTopic(topic).getClientList().get(identifiants) + " dans ce sujet");
+		} catch (RuntimeException e) {
+			account.setText(identifiants + "\n" + "0 message(s) au total dont 0 dans ce sujet");
+		}
+
+		account.setWrappingWidth(120);
 		Button btnDeco = new Button();
 		btnDeco.setText("Déconnexion");
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
@@ -94,7 +105,6 @@ public class ChatWindow extends Application {
 
 		Button btnR = new Button();
 		btnR.setText("Retour");
-		grid.add(btnR, 1, 1);
 		btnR.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -102,6 +112,7 @@ public class ChatWindow extends Application {
 				try {
 					client.removeConnectedTopic(topic);
 					client.setTopicWindow(ft);
+					topic = "";
 					ft.start(primaryStage);
 					System.out.println("Go back");
 				} catch (RemoteException e) {
@@ -111,11 +122,8 @@ public class ChatWindow extends Application {
 			}
 		});
 
-		HBox hbButtons = new HBox();
-		hbButtons.getChildren().addAll(identifiants);
-		VBox vbButtons = new VBox();
-		vbButtons.setSpacing(5);
-		vbButtons.getChildren().addAll(btnDeco, btnR);
+		// HBox hbID = new HBox();
+		// hbID.getChildren().addAll(id);
 
 		output.setEditable(false);
 		output.setStyle("-fx-border-style: none");
@@ -143,12 +151,16 @@ public class ChatWindow extends Application {
 
 		});
 
-		grid.add(scenetitle, 0, 1);
-		grid.add(hbButtons, 0, 0);
-		grid.add(vbButtons, 1, 0);
-		grid.add(output, 0, 2);
-		grid.add(input, 0, 3);
-		grid.add(btn, 1, 3);
+		grid.add(id, 0, 0, 3, 1);
+		grid.add(scenetitle, 0, 1, 3, 1);
+		grid.add(infoText, 0, 2, 3, 1);
+		grid.add(output, 0, 4, 4, 4);
+		grid.add(input, 0, 9, 4, 1);
+
+		grid.add(btnDeco, 5, 0, 1, 1);
+		grid.add(btnR, 5, 1, 1, 1);
+		grid.add(account, 5, 4, 2, 1);
+		grid.add(btn, 5, 9, 1, 1);
 	}
 
 	public void onDeleteTopic() {
@@ -161,7 +173,6 @@ public class ChatWindow extends Application {
 				alert.setContentText(
 						"Le sujet a été supprimé par un autre utilisateur !\nRetour sur la page précédente.");
 				alert.showAndWait();
-				System.out.println("c");
 				TopicWindow ft = new TopicWindow();
 				try {
 					client.removeConnectedTopic(topic);
@@ -178,8 +189,15 @@ public class ChatWindow extends Application {
 
 	private void post() {
 		try {
-			client.post(input.getText(), topic);
-			input.clear();
+			if (!input.getText().equals("")) {
+				client.post(input.getText(), topic);
+				server.getAccount(identifiants).addNbMsg(1);
+				server.getTopic(topic).addNbMsg(identifiants);
+				account.setText(identifiants + "\n" + server.getAccount(identifiants).getNbMsg()
+						+ " message(s) au total\n dont " + server.getTopic(topic).getClientList().get(identifiants)
+						+ " dans ce sujet\n\n");
+				input.clear();
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
