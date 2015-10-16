@@ -1,6 +1,9 @@
 package core;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +19,27 @@ public class Server extends UnicastRemoteObject implements IServer {
 	private Map<String, Account> accounts;
 	private Map<String, Topic> topics;
 	private Collection<IClient> connectedClient;
+	private Collection<IServer> otherServers;
 
-	public Server() throws RemoteException {
+	public Server(String adrP, String portP) throws RemoteException, NotBoundException {
 		accounts = new HashMap<String, Account>();
 		topics = new HashMap<String, Topic>();
 		connectedClient = new ArrayList<IClient>();
+		otherServers = new ArrayList<IServer>();
+		if (adrP.equals("") || portP.equals("")) {
+			System.out.println("fsdf");
+		} else {
+			int remotePort = Integer.parseInt(portP);
+			String remoteIp = adrP;
+			String remoteObjectName = "Server";
+			Registry registry;
+			registry = LocateRegistry.getRegistry(remoteIp, remotePort);
+			IServer s;
+			s = (IServer) registry.lookup(remoteObjectName);
+			s.addServer(this);
+			// s.addServer(adrP, Integer.parseInt(portP));
+			// addServer(adrP, Integer.parseInt(portP));
+		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 
@@ -102,10 +121,6 @@ public class Server extends UnicastRemoteObject implements IServer {
 	@Override
 	public synchronized boolean deleteTopic(String title) throws RemoteException {
 		Topic t = topics.get(title);
-		/*
-		 * for (String client : t.getClientList()) {
-		 * accounts.get(client).removeSubscription(title); }
-		 */
 		for (Entry<String, Integer> entry : t.getClientList().entrySet()) {
 			accounts.get(entry.getKey()).removeSubscription(title);
 		}
@@ -125,6 +140,26 @@ public class Server extends UnicastRemoteObject implements IServer {
 	@Override
 	public synchronized void removeClient(IClient cl) throws RemoteException {
 		connectedClient.remove(cl);
+	}
+
+	@Override
+	public synchronized void addServer(IServer s) throws RemoteException {
+		otherServers.add(s);
+		for (IServer serv : otherServers) {
+			serv.setOtherServers(otherServers);
+		}
+	}
+
+	@Override
+	public void setOtherServers(Collection<IServer> listServers) {
+		otherServers = listServers;
+	}
+
+	public synchronized void removeServer(Server s) throws RemoteException {
+		otherServers.remove(s);
+		for (IServer serv : otherServers) {
+			serv.setOtherServers(otherServers);
+		}
 	}
 
 }
