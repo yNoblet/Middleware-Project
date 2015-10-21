@@ -2,7 +2,10 @@ Suppression de topic
 Synchronisation de création de projet  X
 persistance des données (serveur HS)
 Serveurs multiples
+	-plus de tests sur l'échange de données
+	-gérer le crash d'un serveur
 Passwords + bouton inscription
 emoticones
 /snake pour pendu
 Rajouter infos sur chat
+	-garder nb message client ?

@@ -6,16 +6,13 @@ import java.util.ArrayList;
 
 public interface IAccount extends Remote {
 	public void addSubscription(String topicTitle) throws RemoteException;
-
 	public void removeSubscription(String topicTitle) throws RemoteException;
 
+	public ArrayList<String> getSubscriptionList() throws RemoteException;
+	
 	public String getPseudo() throws RemoteException;
-
 	public void setPseudo(String pseudo) throws RemoteException;
 
-	public ArrayList<String> getSubscriptionList() throws RemoteException;
-
 	public int getNbMsg() throws RemoteException;
-
 	public void addNbMsg(int nb) throws RemoteException;
 }

@@ -5,23 +5,23 @@ public class Message {
 	private String text;
 	
 	public Message(String pseudo, String message) {
-		author = pseudo;
-		text = message;
+		this.author = pseudo;
+		this.text = message;
 	} 
 	
 	@Override
 	public String toString() {
-		return author+": "+text+"\n";
+		return this.author+": "+this.text+"\n";
 	}
 
 	public String getAuthor() {
-		return author;
+		return this.author;
 	}
 	public void setAuthor(String author) {
 		this.author = author;
 	}
 	public String getText() {
-		return text;
+		return this.text;
 	}
 	public void setText(String text) {
 		this.text = text;

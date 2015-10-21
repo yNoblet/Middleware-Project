@@ -14,24 +14,29 @@ public class Account extends UnicastRemoteObject implements IAccount {
 	private ArrayList<String> subscriptionList;
 
 	public Account(String p) throws RemoteException {
-		pseudo = p;
-		subscriptionList = new ArrayList<String>();
+		this.pseudo = p;
+		this.subscriptionList = new ArrayList<String>();
 	}
 
 	@Override
 	public void addSubscription(String topictitle) throws RemoteException {
-		subscriptionList.add(topictitle);
+		this.subscriptionList.add(topictitle);
 		// ENREGISTRER DANS FICHIER
 	}
 
 	@Override
 	public void removeSubscription(String topictitle) throws RemoteException {
-		subscriptionList.remove(topictitle);
+		this.subscriptionList.remove(topictitle);
 	}
 
 	@Override
+	public ArrayList<String> getSubscriptionList() throws RemoteException {
+		return this.subscriptionList;
+	}
+	
+	@Override
 	public String getPseudo() throws RemoteException {
-		return pseudo;
+		return this.pseudo;
 	}
 
 	@Override
@@ -40,13 +45,8 @@ public class Account extends UnicastRemoteObject implements IAccount {
 	}
 
 	@Override
-	public ArrayList<String> getSubscriptionList() throws RemoteException {
-		return subscriptionList;
-	}
-
-	@Override
 	public int getNbMsg() {
-		return nbMsg;
+		return this.nbMsg;
 	}
 
 	@Override

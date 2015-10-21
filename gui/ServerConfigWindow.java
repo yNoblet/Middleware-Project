@@ -46,6 +46,15 @@ public class ServerConfigWindow extends Application {
 				}
 			}
 		});
+		
+		port.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				if (event.getCode() == KeyCode.ENTER) {
+					onEnter();
+				}
+			}
+		});
 	
 		Button btn = new Button();
 		btn.setText("Valider");
@@ -103,20 +112,20 @@ public class ServerConfigWindow extends Application {
 			try {
 				
 				int remotePort = Integer.parseInt(port.getText());
-				String remoteIp = ip.getText(); // ou IP si distant
+				String remoteIp = ip.getText();
 				String remoteObjectName = "Server";
 
-				Registry registry;
-			
-				registry = LocateRegistry.getRegistry(remoteIp, remotePort);
-			
-				IServer s;
-				s = (IServer) registry.lookup(remoteObjectName);
+				Registry registry = LocateRegistry.getRegistry(remoteIp, remotePort);
+				IServer s = (IServer) registry.lookup(remoteObjectName);
 				
 				if(s != null){
-					
+					IServer s2 = (IServer) s.checkPartition();
 					SignInWindow sw = new SignInWindow();
-					sw.setServer(s);
+					if(s2 != null && s2.equals(s)){
+						sw.setServer(s);
+					}else{
+						sw.setServer(s2);
+					}
 					sw.start(primaryStage);
 					
 				} else {

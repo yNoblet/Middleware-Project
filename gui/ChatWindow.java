@@ -38,7 +38,7 @@ public class ChatWindow extends Application {
 	}
 
 	public String getTopic() {
-		return topic;
+		return this.topic;
 	}
 
 	public void setServer(IServer server) {
@@ -50,7 +50,7 @@ public class ChatWindow extends Application {
 	}
 
 	public void setIdentifiants(String id) {
-		identifiants = id;
+		this.identifiants = id;
 	}
 
 	@Override
@@ -75,15 +75,15 @@ public class ChatWindow extends Application {
 
 		try {
 			infoText.setText(
-					"créé par " + server.getTopic(topic).getAuthor() + "\nle " + server.getTopic(topic).getDate());
-			account.setText(
-					identifiants + "\n" + server.getAccount(identifiants).getNbMsg() + " message(s) au total dont "
-							+ server.getTopic(topic).getClientList().get(identifiants) + " dans ce sujet");
+					"créé par " + this.server.getTopic(this.topic).getAuthor() + "\nle " + this.server.getTopic(this.topic).getDate());
+			this.account.setText(
+					this.identifiants + "\n" + this.server.getAccount(this.identifiants).getNbMsg() + " message(s) au total dont "
+							+ this.server.getTopic(this.topic).getClientList().get(this.identifiants) + " dans ce sujet");
 		} catch (RuntimeException e) {
-			account.setText(identifiants + "\n" + "0 message(s) au total dont 0 dans ce sujet");
+			this.account.setText(this.identifiants + "\n" + "0 message(s) au total dont 0 dans ce sujet");
 		}
 
-		account.setWrappingWidth(120);
+		this.account.setWrappingWidth(120);
 		Button btnDeco = new Button();
 		btnDeco.setText("Déconnexion");
 		btnDeco.setOnAction(new EventHandler<ActionEvent>() {
@@ -125,12 +125,12 @@ public class ChatWindow extends Application {
 		// HBox hbID = new HBox();
 		// hbID.getChildren().addAll(id);
 
-		output.setEditable(false);
-		output.setStyle("-fx-border-style: none");
-		output.setFocusTraversable(false);
+		this.output.setEditable(false);
+		this.output.setStyle("-fx-border-style: none");
+		this.output.setFocusTraversable(false);
 
-		input = new TextField();
-		input.setOnKeyPressed(new EventHandler<KeyEvent>() {
+		this.input = new TextField();
+		this.input.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.ENTER) {
@@ -154,12 +154,12 @@ public class ChatWindow extends Application {
 		grid.add(id, 0, 0, 3, 1);
 		grid.add(scenetitle, 0, 1, 3, 1);
 		grid.add(infoText, 0, 2, 3, 1);
-		grid.add(output, 0, 4, 4, 4);
-		grid.add(input, 0, 9, 4, 1);
+		grid.add(this.output, 0, 4, 4, 4);
+		grid.add(this.input, 0, 9, 4, 1);
 
 		grid.add(btnDeco, 5, 0, 1, 1);
 		grid.add(btnR, 5, 1, 1, 1);
-		grid.add(account, 5, 4, 2, 1);
+		grid.add(this.account, 5, 4, 2, 1);
 		grid.add(btn, 5, 9, 1, 1);
 	}
 
