@@ -302,7 +302,7 @@ public class TopicWindow extends Application {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Erreur");
 				alert.setHeaderText("Erreur de serveur");
-				alert.setContentText("Le serveur a été perdu!");
+				alert.setContentText("Le serveur a été perdu !");
 				alert.showAndWait();
 
 				ServerConfigWindow scw = new ServerConfigWindow();

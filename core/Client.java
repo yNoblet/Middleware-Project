@@ -25,7 +25,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.pseudo = p;
 		this.connectedTopics = new ArrayList<ITopic>();
 		this.server = s;
-		this.server.getTopicTitles();
+		//this.server.getTopicTitles();
 		this.server.addClient(this);
 		this.account = s.getAccount(p);
 
@@ -44,7 +44,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 	
 	@Override
 	public void post(String msg, String topicTitle) throws RemoteException {
-		this.server.getTopic(topicTitle).post(this.pseudo, msg);
+		this.server.postMessage(topicTitle, this.pseudo, msg);
 	}
 	
 	@Override

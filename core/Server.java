@@ -1,5 +1,7 @@
 package core;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -20,17 +22,23 @@ public class Server extends UnicastRemoteObject implements IServer {
 	private Map<String, IAccount> accounts;
 	private Map<String, ITopic> topics;
 	private Collection<IClient> connectedClient;
-	private Collection<IServer> otherServers;
+	private Collection<IServer> listServers;
+	private String ip;
+	private String port;
 
-	public Server(String adrP, String portP, String portS) throws RemoteException, NotBoundException, AlreadyBoundException {
+	public Server(String adrP, String portP, String portS) throws RemoteException, NotBoundException, AlreadyBoundException, UnknownHostException {
+		Registry reg = java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(portS));
+		reg.bind("Server", this);
+		this.ip = InetAddress.getLocalHost().getHostAddress();
+		this.port = portS;
+		
 		this.accounts = new HashMap<String, IAccount>();
 		this.topics = new HashMap<String, ITopic>();
 		this.connectedClient = new ArrayList<IClient>();
-		this.otherServers = new ArrayList<IServer>();
-		Registry reg = java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(portS));
-		reg.bind("Server", this);
+		this.listServers = new ArrayList<IServer>();
 		
 		if (adrP.equals("") || portP.equals("")) {
+			this.listServers.add(this);
 			System.out.println("first server");
 		} else {
 			int remotePort = Integer.parseInt(portP);
@@ -38,9 +46,16 @@ public class Server extends UnicastRemoteObject implements IServer {
 			String remoteObjectName = "Server";
 			Registry registryMain = LocateRegistry.getRegistry(remoteIp, remotePort);
 			IServer s = (IServer) registryMain.lookup(remoteObjectName);
+			
+			for (IServer serv : s.getServerList()) {
+				this.addServer(serv);
+				if(!serv.equals(s)){
+					serv.addServer(this);
+				}
+			}
 			s.addServer(this);
-			// s.addServer(adrP, Integer.parseInt(portP));
-			// addServer(adrP, Integer.parseInt(portP));
+			this.listServers.add(this);
+
 		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -59,10 +74,14 @@ public class Server extends UnicastRemoteObject implements IServer {
 	public IServer checkPartition() throws RemoteException{
 		IServer s = this;
 		int nbConnectedClient = this.getConnectedClient().size();
-		for (IServer serv : this.otherServers) {
-			if(serv.getConnectedClient().size() < nbConnectedClient){
-				s = serv;
-				nbConnectedClient = serv.getConnectedClient().size();
+		for (IServer serv : this.listServers) {
+			try{
+				if(serv.getConnectedClient().size() < nbConnectedClient){
+					s = serv;
+					nbConnectedClient = serv.getConnectedClient().size();
+				}
+			}catch(Exception e){
+				System.out.println("(Server)checkPartition : serveur HS");
 			}
 		}
 		return s;
@@ -80,22 +99,15 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 
 	@Override
-	public synchronized boolean newTopic(String title, String p) throws RemoteException {
+	public synchronized boolean newTopic(String title, String author) throws RemoteException {
 		if (this.topics.get(title) == null) {
-			this.addTopic(title, new Topic(title, p));
-			this.accounts.get(p).addSubscription(title);
-			for (IClient c : this.connectedClient) {
-				if (!c.getPseudo().equals(p)) {
-					c.addTopic(title);
-				}
-			}
-			//notify other servers
-			for (IServer serv : this.otherServers) {
-				serv.addTopic(title, new Topic(title, p));
-				//serv.getAccounts().get(p).addSubscription(title);
-				serv.setAccountList(this.accounts);
+			//notify all servers
+			for (IServer serv : this.listServers) {
+				serv.addTopic(title, author);
+				serv.getAccount(author).addSubscription(title);
+				
 				for (IClient c : serv.getConnectedClient()) {
-					if (!c.getPseudo().equals(p)) {
+					if (!c.getPseudo().equals(author)) {
 						c.addTopic(title);
 					}
 				}
@@ -107,22 +119,13 @@ public class Server extends UnicastRemoteObject implements IServer {
 	
 	@Override
 	public synchronized boolean deleteTopic(String title) throws RemoteException {
-		Topic t = (Topic) this.topics.get(title);
-		for (Entry<String, Integer> entry : t.getClientList().entrySet()) {
-			this.accounts.get(entry.getKey()).removeSubscription(title);
-		}
-
-		this.topics.remove(title);
-		for (IClient c : this.connectedClient) {
-			c.removeTopic(title);
-		}
 		
-		//notify other servers
-		for (IServer serv : this.otherServers) {
-			/*for (Entry<String, Integer> entry : t.getClientList().entrySet()) {
-				serv.getAccounts().get(entry.getKey()).removeSubscription(title);
-			}*/
-			serv.setAccountList(this.accounts);
+		//notify all servers
+		for (IServer serv : this.listServers) {
+			Topic t = (Topic) serv.getTopic(title);
+			for (Entry<String, Integer> entry : t.getClientList().entrySet()) {
+				serv.getAccountList().get(entry.getKey()).removeSubscription(title);
+			}
 
 			serv.getTopicList().remove(title);
 			for (IClient c : serv.getConnectedClient()) {
@@ -133,8 +136,8 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public void addTopic(String title, ITopic topic) throws RemoteException {
-		this.topics.put(title, topic);
+	public void addTopic(String title, String author) throws RemoteException {
+		this.topics.put(title, new Topic(title, author));
 	}
 	
 	@Override
@@ -168,26 +171,18 @@ public class Server extends UnicastRemoteObject implements IServer {
 	}
 	
 	@Override
-	public synchronized void addServer(IServer s) throws RemoteException {
-		this.otherServers.add(s);
-		System.out.println("main "+this.toString());
-		for (IServer serv : this.otherServers) {
-			serv.setOtherServers(this.otherServers, this);
-		}
+	public synchronized void addServer(IServer s) throws RemoteException, NotBoundException {
+		this.listServers.add(s);
 	}
 
-	public synchronized void removeServer(Server s) throws RemoteException {
-		this.otherServers.remove(s);
-		for (IServer serv : this.otherServers) {
-			serv.setOtherServers(this.otherServers, this);
-		}
+	public synchronized void removeServer(IServer s) throws RemoteException {
+		this.listServers.remove(s);
 	}
 	
-	@Override
-	public void setOtherServers(Collection<IServer> listServers, IServer me) {
-		this.otherServers = listServers;
-		this.otherServers.add(me);
-		System.out.println("sec "+this.toString());
+	public synchronized void notifyRemove(IServer s) throws RemoteException {
+		for (IServer serv : this.listServers) {
+			serv.removeServer(s);
+		}
 	}
 
 	@Override
@@ -198,9 +193,8 @@ public class Server extends UnicastRemoteObject implements IServer {
 	@Override
 	public synchronized IAccount getAccount(String cl) throws RemoteException {
 		if (this.accounts.get(cl) == null) {
-			this.accounts.put(cl, new Account(cl));
-			for (IServer serv : this.otherServers) {
-				serv.setAccountList(this.accounts);
+			for (IServer serv : this.listServers) {
+				serv.addAccount(cl);
 			}
 		}
 		return this.accounts.get(cl);
@@ -211,8 +205,40 @@ public class Server extends UnicastRemoteObject implements IServer {
 		return this.accounts;
 	}
 
-	public void setAccountList(Map<String, IAccount> accs) throws RemoteException {
-		this.accounts = accs;
+	@Override
+	public void postMessage(String topicTitle, String author, String msg) throws RemoteException {
+		for (IServer serv : this.listServers) {
+			try{
+				serv.getTopic(topicTitle).post(author, msg);
+			}catch(Exception e){
+				System.out.println("(Server)postMessage : serveur HS");
+			}
+			
+		}
 	}
 
+	@Override
+	public String getPort() throws RemoteException {
+		return this.port;
+	}
+
+	@Override
+	public String getIP() throws RemoteException {
+		return this.ip;
+	}
+
+	@Override
+	public Collection<IServer> getServerList() throws RemoteException {
+		return this.listServers;
+	}
+
+	@Override
+	public void addAccount(String cl) throws RemoteException {
+		this.accounts.put(cl, new Account(cl));
+	}
+	
+	@Override
+	public void removeAccount(String cl) throws RemoteException {
+		this.accounts.remove(cl);
+	}
 }

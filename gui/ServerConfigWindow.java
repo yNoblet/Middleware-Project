@@ -117,13 +117,11 @@ public class ServerConfigWindow extends Application {
 
 				Registry registry = LocateRegistry.getRegistry(remoteIp, remotePort);
 				IServer s = (IServer) registry.lookup(remoteObjectName);
-				
+
 				if(s != null){
 					IServer s2 = (IServer) s.checkPartition();
 					SignInWindow sw = new SignInWindow();
-					if(s2 != null && s2.equals(s)){
-						sw.setServer(s);
-					}else{
+					if(s2 != null){
 						sw.setServer(s2);
 					}
 					sw.start(primaryStage);

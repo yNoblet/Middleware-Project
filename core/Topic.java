@@ -71,7 +71,11 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 
 	private void notifyMembers(String msg) throws RemoteException {
 		for (IClient c : this.connectedClients) {
-			c.refresh(msg);
+			try{
+				c.refresh(msg);
+			}catch(Exception e){
+				System.out.println("client deconnecté");
+			}
 		}
 	}
 

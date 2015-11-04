@@ -212,14 +212,14 @@ public class ChatWindow extends Application {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				Alert alert = new Alert(AlertType.ERROR);
+				/*Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Erreur");
 				alert.setHeaderText("Erreur de serveur");
-				alert.setContentText("Le serveur a été perdu!");
-				alert.showAndWait();
+				alert.setContentText("Le serveur a été perdu !");
+				alert.showAndWait();*/
 
-				ServerConfigWindow scw = new ServerConfigWindow();
-				scw.start(primaryStage);
+				/*ServerConfigWindow scw = new ServerConfigWindow();
+				scw.start(primaryStage);*/
 			}
 		});
 	}

@@ -1,5 +1,6 @@
 package core;
 
+import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -10,7 +11,7 @@ public interface IServer extends Remote {
 	
 	public boolean newTopic(String title, String p) throws RemoteException;
 	public boolean deleteTopic(String title) throws RemoteException;
-	public void addTopic(String title, ITopic topic) throws RemoteException;
+	public void addTopic(String title, String author) throws RemoteException;
 	public ITopic getTopic(String title) throws RemoteException;
 	public Map<String, ITopic> getTopicList() throws RemoteException;
 	public Collection<String> getTopicTitles() throws RemoteException;
@@ -18,12 +19,19 @@ public interface IServer extends Remote {
 	public void addClient(IClient cl) throws RemoteException;
 	public void removeClient(IClient cl) throws RemoteException;
 	
-	public void addServer(IServer s) throws RemoteException;
-	public void setOtherServers(Collection<IServer> otherServers, IServer server) throws RemoteException;
+	public void addServer(IServer s) throws RemoteException, NotBoundException;
+	public void removeServer(IServer s) throws RemoteException;
+	public Collection<IServer> getServerList() throws RemoteException;
 	
 	public IAccount getAccount(String client) throws RemoteException;
-	public void setAccountList(Map<String, IAccount> accounts) throws RemoteException;
+	public void addAccount(String cl) throws RemoteException;
+	void removeAccount(String cl) throws RemoteException;
 	public Map<String, IAccount> getAccountList() throws RemoteException;
 	
 	public Collection<IClient> getConnectedClient() throws RemoteException;
+	public void postMessage(String topicTitle, String author, String msg) throws RemoteException;
+
+	public String getPort() throws RemoteException;
+	public String getIP() throws RemoteException;
+
 }

@@ -15,7 +15,7 @@ public class StartServer {
 			sc.close();
 
 			new Server(adrP, portP, portS);
-
+			
 			/*
 			 * IAccount a = obj.getAccount("author1"); IAccount b =
 			 * obj.getAccount("A");
