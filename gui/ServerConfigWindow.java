@@ -138,7 +138,7 @@ public class ServerConfigWindow extends Application {
 				IServer s = (IServer) registry.lookup(remoteObjectName);
 
 				if(s != null){
-					IServer s2 = (IServer) s.checkPartition();
+					IServer s2 = (IServer) s.checkDistribution();
 					SignInWindow sw = new SignInWindow();
 					if(s2 != null){
 						sw.setServer(s2);

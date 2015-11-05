@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Topic.
  */
@@ -20,23 +19,22 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -3180799191650643596L;
 	
-	/** The title. */
+	/** The title of the topic. */
 	private String title;
 	
-	/** The author. */
+	/** The author of the topic. */
 	private String author;
 	
-	/** The client list. */
-	// private Set<String> clientList;
+	/** The list of clients who subscribed. */
 	private Map<String, Integer> clientList;
 	
-	/** The historic. */
+	/** The historic of messages. */
 	private ArrayList<Message> historic;
 	
-	/** The connected clients. */
+	/** Currently connected clients. */
 	private Set<IClient> connectedClients;
 	
-	/** The date. */
+	/** The creation date. */
 	private String date;
 	
 	/**
@@ -59,124 +57,32 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		this.date = dateFormat.format(d);
 	}
 	
-	/* (non-Javadoc)
-	 * @see core.ITopic#subscribe(java.lang.String)
-	 */
-	@Override
-	public void subscribe(String pseudo) throws RemoteException {
-		this.clientList.put(pseudo, 0);
-	}
-
-	/* (non-Javadoc)
-	 * @see core.ITopic#unsubscribe(java.lang.String)
-	 */
-	@Override
-	public void unsubscribe(String pseudo) throws RemoteException {
-		this.clientList.remove(pseudo);
-	}
-
-	/* (non-Javadoc)
-	 * @see core.ITopic#post(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void post(String pseudo, String message) throws RemoteException {
-		Message msg = new Message(pseudo, message);
-		this.historic.add(msg);
-		notifyMembers(msg.toString());
-	}
-
-	/* (non-Javadoc)
-	 * @see core.ITopic#connectClient(core.IClient)
-	 */
-	@Override
-	public void connectClient(IClient cl) throws RemoteException {
-		this.connectedClients.add(cl);
-		cl.setConnectedTopic(this);
-		cl.refresh(getHistoricString());
-	}
-
-	/* (non-Javadoc)
-	 * @see core.ITopic#disconnectClient(core.IClient)
-	 */
-	@Override
-	public void disconnectClient(IClient cl) throws RemoteException {
-		this.connectedClients.remove(cl);
-		cl.removeConnectedTopic();
-	}
-
 	/**
-	 * Notify members.
-	 *
-	 * @param msg the msg
-	 * @throws RemoteException the remote exception
-	 */
-	private void notifyMembers(String msg) throws RemoteException {
-		ArrayList<IClient> clientToRemove = new ArrayList<>();
-		for (IClient c : this.connectedClients) {
-			System.out.println(c.getPseudo());
-			try{
-				c.refresh(msg);
-			}catch(RemoteException e){
-				System.out.println("client deconnecté");
-				clientToRemove.add(c);
-			}
-		}
-		connectedClients.removeAll(clientToRemove);
-	}
-
-	/* (non-Javadoc)
 	 * @see core.ITopic#getTitle()
 	 */
 	@Override
 	public String getTitle() {
 		return this.title;
 	}
-
+	
 	/**
-	 * Sets the title.
-	 *
-	 * @param title the new title
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	/* (non-Javadoc)
 	 * @see core.ITopic#getAuthor()
 	 */
 	@Override
 	public String getAuthor() {
 		return this.author;
 	}
-
+	
 	/**
-	 * Sets the author.
-	 *
-	 * @param author the new author
-	 */
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-
-	/* (non-Javadoc)
-	 * @see core.ITopic#getClientList()
+	 * @see core.ITopic#getDate()
 	 */
 	@Override
-	public Map<String, Integer> getClientList() {
-		return this.clientList;
+	public String getDate() throws RemoteException {
+		return this.date;
 	}
-
+	
 	/**
-	 * Sets the client list.
-	 *
-	 * @param clientList the client list
-	 */
-	public void setClientList(Map<String, Integer> clientList) {
-		this.clientList = clientList;
-	}
-
-	/**
-	 * Gets the historic.
+	 * Gets the historic of the topic.
 	 *
 	 * @return the historic
 	 */
@@ -185,16 +91,7 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 	}
 
 	/**
-	 * Sets the historic.
-	 *
-	 * @param historic the new historic
-	 */
-	public void setHistoric(ArrayList<Message> historic) {
-		this.historic = historic;
-	}
-
-	/**
-	 * Gets the historic string.
+	 * Gets the historic as a string object.
 	 *
 	 * @return the historic string
 	 */
@@ -205,20 +102,94 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 		}
 		return hist;
 	}
-
-	/* (non-Javadoc)
+	
+	/**
+	 * Sets the historic of the topic.
+	 *
+	 * @param historic the new historic
+	 */
+	public void setHistoric(ArrayList<Message> historic) {
+		this.historic = historic;
+	}
+	
+	/**
+	 * @see core.ITopic#getClientList()
+	 */
+	@Override
+	public Map<String, Integer> getClientList() {
+		return this.clientList;
+	}
+	
+	/**
+	 * @see core.ITopic#post(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void post(String pseudo, String message) throws RemoteException {
+		Message msg = new Message(pseudo, message);
+		this.historic.add(msg);
+		notifyMembers(msg.toString());
+	}
+	
+	/**
+	 * Notify members of the topic with the new message.
+	 *
+	 * @param msg the message
+	 * @throws RemoteException the remote exception
+	 */
+	private void notifyMembers(String msg) throws RemoteException {
+		ArrayList<IClient> clientToRemove = new ArrayList<>();
+		for (IClient c : this.connectedClients) {
+			try{
+				c.refresh(msg);
+			}catch(RemoteException e){
+				System.out.println("client deconnecté");
+				clientToRemove.add(c);
+			}
+		}
+		connectedClients.removeAll(clientToRemove);
+	}
+	
+	/**
 	 * @see core.ITopic#addNbMsg(java.lang.String)
 	 */
 	@Override
-	public void addNbMsg(String client) throws RemoteException {
+	public void refreshNbMsg(String client) throws RemoteException {
 		getClientList().replace(client, getClientList().get(client) + 1);
 	}
-
-	/* (non-Javadoc)
-	 * @see core.ITopic#getDate()
+	
+	/**
+	 * @see core.ITopic#subscribe(java.lang.String)
 	 */
 	@Override
-	public String getDate() throws RemoteException {
-		return this.date;
+	public void subscribe(String pseudo) throws RemoteException {
+		this.clientList.put(pseudo, 0);
 	}
+
+	/**
+	 * @see core.ITopic#unsubscribe(java.lang.String)
+	 */
+	@Override
+	public void unsubscribe(String pseudo) throws RemoteException {
+		this.clientList.remove(pseudo);
+	}
+
+	/**
+	 * @see core.ITopic#connectClient(core.IClient)
+	 */
+	@Override
+	public void connectClient(IClient cl) throws RemoteException {
+		this.connectedClients.add(cl);
+		cl.setConnectedTopic(this);
+		cl.refresh(getHistoricString());
+	}
+
+	/**
+	 * @see core.ITopic#disconnectClient(core.IClient)
+	 */
+	@Override
+	public void disconnectClient(IClient cl) throws RemoteException {
+		this.connectedClients.remove(cl);
+		cl.removeConnectedTopic();
+	}
+
 }

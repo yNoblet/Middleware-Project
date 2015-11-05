@@ -12,7 +12,7 @@ public interface IAccount extends Remote {
 	/**
 	 * Gets the pseudo.
 	 *
-	 * @return the pseudo
+	 * @return the pseudo associate to the account
 	 * @throws RemoteException the remote exception
 	 */
 	public String getPseudo() throws RemoteException;

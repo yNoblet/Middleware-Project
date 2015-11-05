@@ -7,7 +7,6 @@ import java.util.Collection;
 import gui.ChatWindow;
 import gui.TopicWindow;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Client.
  */
@@ -16,29 +15,29 @@ public class Client extends UnicastRemoteObject implements IClient {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5697099462906475057L;
 	
-	/** The pseudo. */
+	/** The pseudo of the client. */
 	private String pseudo;
 	
-	/** The connected topic. */
+	/** The current connected topic. */
 	private ITopic connectedTopic;
 	
-	/** The server. */
+	/** The current server hosting the client. */
 	IServer server;
 	
-	/** The account. */
+	/** The account associate to the client. */
 	IAccount account;
 	
-	/** The cw. */
+	/** The chat window. */
 	ChatWindow cw;
 	
-	/** The tw. */
+	/** The topic window. */
 	TopicWindow tw;
 
 	/**
 	 * Instantiates a new client.
 	 *
-	 * @param p the p
-	 * @param s the s
+	 * @param p the pseudo of the client
+	 * @param s the server hosting the client
 	 * @throws RemoteException the remote exception
 	 */
 	public Client(String p, IServer s) throws RemoteException {
@@ -60,7 +59,15 @@ public class Client extends UnicastRemoteObject implements IClient {
 		}));
 	}
 	
-	/* (non-Javadoc)
+	/**
+	 * @see core.IClient#getPseudo()
+	 */
+	@Override
+	public String getPseudo() throws RemoteException {
+		return this.pseudo;
+	}
+	
+	/**
 	 * @see core.IClient#post(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -68,25 +75,15 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.server.postMessage(topicTitle, this.pseudo, msg);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#refresh(java.lang.String)
 	 */
 	@Override
 	public void refresh(String message) throws RemoteException {
 		this.cw.displayMsg(message);
 	}
-
-	/**
-	 * On disconnect.
-	 *
-	 * @throws RemoteException the remote exception
-	 */
-	private void onDisconnect() throws RemoteException {
-		connectedTopic.disconnectClient(this);
-		this.server.removeClient(this);
-	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#setConnectedTopic(core.ITopic)
 	 */
 	@Override
@@ -94,7 +91,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.connectedTopic = t;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#removeConnectedTopic()
 	 */
 	@Override
@@ -102,35 +99,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.connectedTopic = null;
 	}
 
-	/* (non-Javadoc)
-	 * @see core.IClient#setChatWindow(gui.ChatWindow, java.lang.String)
-	 */
-	@Override
-	public void setChatWindow(ChatWindow cw, String topicTitle) throws RemoteException {
-		this.cw = cw;
-		cw.setIdentifiants(this.pseudo);
-		cw.setServer(this.server);
-		cw.setClient(this);
-		cw.setTopic(topicTitle);
-		this.server.getTopic(topicTitle).connectClient(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see core.IClient#setTopicWindow(gui.TopicWindow)
-	 */
-	@Override
-	public void setTopicWindow(TopicWindow tw) throws RemoteException {
-		this.tw = tw;
-		tw.setPseudo(this.pseudo);
-		tw.setClient(this);
-		tw.setServer(this.server);
-		tw.setSubscribedTopic(this.account.getSubscriptionList());
-		Collection<String> at = this.server.getTopicTitles();
-		at.removeAll(this.account.getSubscriptionList());
-		tw.setAvailableTopic(at);
-	}
-
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#addSubscribedTopic(java.lang.String)
 	 */
 	@Override
@@ -138,7 +107,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.account.addSubscription(t);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#removeSubscribedTopic(java.lang.String)
 	 */
 	@Override
@@ -146,7 +115,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.account.removeSubscription(t);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#onCreateTopic(java.lang.String)
 	 */
 	@Override
@@ -156,7 +125,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 		}
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#onDeleteTopic(java.lang.String)
 	 */
 	@Override
@@ -169,15 +138,17 @@ public class Client extends UnicastRemoteObject implements IClient {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see core.IClient#getPseudo()
+	/**
+	 * On disconnect, handles the client activity.
+	 *
+	 * @throws RemoteException the remote exception
 	 */
-	@Override
-	public String getPseudo() throws RemoteException {
-		return this.pseudo;
+	private void onDisconnect() throws RemoteException {
+		connectedTopic.disconnectClient(this);
+		this.server.removeClient(this);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see core.IClient#onServerDown()
 	 */
 	@Override
@@ -189,6 +160,34 @@ public class Client extends UnicastRemoteObject implements IClient {
 		if (this.tw != null) {
 			this.tw.serverDown();
 		}
+	}
+	
+	/**
+	 * @see core.IClient#setChatWindow(gui.ChatWindow, java.lang.String)
+	 */
+	@Override
+	public void setChatWindow(ChatWindow cw, String topicTitle) throws RemoteException {
+		this.cw = cw;
+		cw.setIdentifiants(this.pseudo);
+		cw.setServer(this.server);
+		cw.setClient(this);
+		cw.setTopic(topicTitle);
+		this.server.getTopic(topicTitle).connectClient(this);
+	}
+
+	/**
+	 * @see core.IClient#setTopicWindow(gui.TopicWindow)
+	 */
+	@Override
+	public void setTopicWindow(TopicWindow tw) throws RemoteException {
+		this.tw = tw;
+		tw.setPseudo(this.pseudo);
+		tw.setClient(this);
+		tw.setServer(this.server);
+		tw.setSubscribedTopic(this.account.getSubscriptionList());
+		Collection<String> at = this.server.getTopicTitles();
+		at.removeAll(this.account.getSubscriptionList());
+		tw.setAvailableTopic(at);
 	}
 
 }

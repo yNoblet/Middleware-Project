@@ -49,7 +49,7 @@ public class Account extends UnicastRemoteObject implements IAccount {
 	}
 
 	/**
-	 * @see core.IAccount#addNbMsg(int)
+	 * @see core.IAccount#refreshNbMsg(int)
 	 */
 	@Override
 	public void incrementsNbMsg() {

@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Server.
  */
@@ -23,52 +22,52 @@ public class Server extends UnicastRemoteObject implements IServer {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 5348901788833610650L;
 	
-	/** The accounts. */
+	/** The list of accounts. */
 	private Map<String, IAccount> accounts;
 	
-	/** The topics. */
+	/** The list of topics. */
 	private Map<String, ITopic> topics;
 	
-	/** The connected client. */
-	private Collection<IClient> connectedClient;
+	/** The list of connected clients. */
+	private Collection<IClient> connectedClients;
 	
-	/** The list servers. */
+	/** The list of servers. */
 	private Collection<IServer> listServers;
 	
-	/** The ip. */
+	/** The IP address of the server. */
 	private String ip;
 	
-	/** The port. */
+	/** The port of connection of the server. */
 	private String port;
 
 	/**
 	 * Instantiates a new server.
 	 *
-	 * @param adrP the adr p
-	 * @param portP the port p
-	 * @param portS the port s
+	 * @param addrMain the IP address of an online server
+	 * @param portMain the port of an online server
+	 * @param portSelf the port for this server
 	 * @throws RemoteException the remote exception
 	 * @throws NotBoundException the not bound exception
 	 * @throws AlreadyBoundException the already bound exception
 	 * @throws UnknownHostException the unknown host exception
 	 */
-	public Server(String adrP, String portP, String portS) throws RemoteException, NotBoundException, AlreadyBoundException, UnknownHostException {
-		Registry reg = java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(portS));
+	public Server(String addrMain, String portMain, String portSelf) throws RemoteException, NotBoundException, AlreadyBoundException, UnknownHostException {
+		Registry reg = java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(portSelf));
 		reg.bind("Server", this);
 		this.ip = InetAddress.getLocalHost().getHostAddress();
-		this.port = portS;
+		this.port = portSelf;
 		
 		this.accounts = new HashMap<String, IAccount>();
 		this.topics = new HashMap<String, ITopic>();
-		this.connectedClient = new ArrayList<IClient>();
+		this.connectedClients = new ArrayList<IClient>();
 		this.listServers = new ArrayList<IServer>();
 		
-		if (adrP.equals("") || portP.equals("")) {
+		if (addrMain.equals("") || portMain.equals("")) {
 			this.listServers.add(this);
 			System.out.println("first server");
 		} else {
-			int remotePort = Integer.parseInt(portP);
-			String remoteIp = adrP;
+			int remotePort = Integer.parseInt(portMain);
+			String remoteIp = addrMain;
 			String remoteObjectName = "Server";
 			Registry registryMain = LocateRegistry.getRegistry(remoteIp, remotePort);
 			IServer s = (IServer) registryMain.lookup(remoteObjectName);
@@ -97,48 +96,102 @@ public class Server extends UnicastRemoteObject implements IServer {
 		}));
 	}
 	
-	/* (non-Javadoc)
-	 * @see core.IServer#checkPartition()
+	/**
+	 * @see core.IServer#getPort()
 	 */
-	public IServer checkPartition() throws RemoteException{
+	@Override
+	public String getPort() throws RemoteException {
+		return this.port;
+	}
+
+	/**
+	 * @see core.IServer#getIP()
+	 */
+	@Override
+	public String getIP() throws RemoteException {
+		return this.ip;
+	}
+	
+	/**
+	 * @see core.IServer#checkDistribution()
+	 */
+	public IServer checkDistribution() throws RemoteException{
 		IServer s = this;
-		int nbConnectedClient = this.getConnectedClient().size();
+		int nbConnectedClient = this.getConnectedClients().size();
 		ArrayList<IServer> serverToRemove = new ArrayList<>();
 		for (IServer serv : this.listServers) {
 			try{
-				if(serv.getConnectedClient().size() < nbConnectedClient){
+				if(serv.getConnectedClients().size() < nbConnectedClient){
 					s = serv;
-					nbConnectedClient = serv.getConnectedClient().size();
+					nbConnectedClient = serv.getConnectedClients().size();
 				}
 			}catch(RemoteException e){
-				System.out.println("Exception : (Server)checkPartition : server offline");
+				System.out.println("Exception : (Server) checkDistribution : server offline");
 				serverToRemove.add(serv);
 			}
 		}
 		listServers.removeAll(serverToRemove);
 		return s;
 	}
-
+	
 	/**
-	 * On disconnect.
-	 *
-	 * @throws RemoteException the remote exception
+	 * @see core.IServer#addServer(core.IServer)
 	 */
-	public void onDisconnect() throws RemoteException {
-		for (IClient c : this.connectedClient) {
-			try {
-				c.onServerDown();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+	@Override
+	public synchronized void addServer(IServer s) throws RemoteException, NotBoundException {
+		this.listServers.add(s);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * @see core.IServer#removeServer(core.IServer)
+	 */
+	public synchronized void removeServer(IServer s) throws RemoteException {
+		this.listServers.remove(s);
+	}
+	
+	/**
+	 * @see core.IServer#getServerList()
+	 */
+	@Override
+	public Collection<IServer> getServerList() throws RemoteException {
+		return this.listServers;
+	}
+	
+	/**
+	 * @see core.IServer#postMessage(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void postMessage(String topicTitle, String author, String msg) throws RemoteException {
+		IServer s = this;
+		Thread t = new Thread(new Runnable(){
+
+			@Override
+			public void run() {
+				ArrayList<IServer> serverToRemove = new ArrayList<>();
+				for (IServer serv : listServers) {
+					if(!serv.equals(s)){
+						try{
+							System.out.println(serv.getPort());
+							serv.getTopic(topicTitle).post(author, msg);
+						}catch(RemoteException e){
+							System.out.println("Exception : (Server) postMessage : server offline");
+							serverToRemove.add(serv);
+						}
+					}
+				}
+				listServers.removeAll(serverToRemove);
+			}
+			
+		});
+		t.start();
+		this.getTopic(topicTitle).post(author, msg);
+	}
+
+	/**
 	 * @see core.IServer#newTopic(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public synchronized boolean newTopic(String title, String author) throws RemoteException {
+	public synchronized boolean onCreateNewTopic(String title, String author) throws RemoteException {
 		IServer s = this;
 		if (this.topics.get(title) == null) {
 			Thread t = new Thread(new Runnable(){
@@ -154,32 +207,32 @@ public class Server extends UnicastRemoteObject implements IServer {
 								serv.addTopic(title, author);
 								serv.getAccount(author).addSubscription(title);
 								
-								for (IClient c : serv.getConnectedClient()) {
+								for (IClient c : serv.getConnectedClients()) {
 									try {
 										if (!c.getPseudo().equals(author)) {
 											c.onCreateTopic(title);
 										}
 									}catch(RemoteException e){
-										System.out.println("Exception : (Server) newTopic : client offline");
+										System.out.println("Exception : (Server) onCreateNewTopic : client offline");
 										clientToRemove.add(c);
 									}
 								}
 							} catch (RemoteException e) {
-								System.out.println("Exception : (Server) newTopic : server offline");
+								System.out.println("Exception : (Server) onCreateNewTopic : server offline");
 								serverToRemove.add(serv);
 								//e.printStackTrace();
 							}
 						}
 					}
 					listServers.removeAll(serverToRemove);
-					connectedClient.removeAll(clientToRemove);
+					connectedClients.removeAll(clientToRemove);
 				}
 			});
 			t.start();
 			this.addTopic(title, author);
 			this.getAccount(author).addSubscription(title);
 			
-			for (IClient c : this.getConnectedClient()) {
+			for (IClient c : this.getConnectedClients()) {
 				if (!c.getPseudo().equals(author)) {
 					c.onCreateTopic(title);
 				}
@@ -189,11 +242,11 @@ public class Server extends UnicastRemoteObject implements IServer {
 		return false;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#deleteTopic(java.lang.String)
 	 */
 	@Override
-	public synchronized boolean deleteTopic(String title) throws RemoteException {
+	public synchronized boolean onDeleteTopic(String title) throws RemoteException {
 		IServer s = this;
 		Thread t = new Thread(new Runnable(){
 
@@ -211,23 +264,23 @@ public class Server extends UnicastRemoteObject implements IServer {
 							}
 							serv.removeTopic(title);
 							
-							for (IClient c : serv.getConnectedClient()) {
+							for (IClient c : serv.getConnectedClients()) {
 								try {
 									c.onDeleteTopic(title);
 								}catch(RemoteException e){
-									System.out.println("Exception : (Server) deleteTopic : client offline");
+									System.out.println("Exception : (Server) onDeleteTopic : client offline");
 									clientToRemove.add(c);
 								}
 							}
 						} catch (RemoteException e) {
-							System.out.println("Exception : (Server) deleteTopic : server offline");
+							System.out.println("Exception : (Server) onDeleteTopic : server offline");
 							serverToRemove.add(serv);
 							//e.printStackTrace();
 						}
 					}
 				}
 				listServers.removeAll(serverToRemove);
-				connectedClient.removeAll(clientToRemove);
+				connectedClients.removeAll(clientToRemove);
 			}
 		});
 		t.start();
@@ -237,13 +290,13 @@ public class Server extends UnicastRemoteObject implements IServer {
 		}
 		this.getTopicList().remove(title);
 		
-		for (IClient c : this.getConnectedClient()) {
+		for (IClient c : this.getConnectedClients()) {
 			c.onDeleteTopic(title);
 		}
 		return true;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#addTopic(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -251,31 +304,30 @@ public class Server extends UnicastRemoteObject implements IServer {
 		this.topics.put(title, new Topic(title, author));
 	}
 	
-	/* (non-Javadoc)
+	/**
+	 * @see core.IServer#removeTopic(java.lang.String)
+	 */
+	@Override
+	public void removeTopic(String topicTitle) throws RemoteException {
+		this.topics.remove(topicTitle);
+	}
+	
+	/**
 	 * @see core.IServer#getTopic(java.lang.String)
 	 */
 	@Override
-	public synchronized ITopic getTopic(String title) throws RemoteException {
-		return this.topics.get(title);
+	public synchronized ITopic getTopic(String topicTitle) throws RemoteException {
+		return this.topics.get(topicTitle);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#getTopicList()
 	 */
 	public Map<String, ITopic> getTopicList() {
 		return this.topics;
 	}
-
-	/**
-	 * Sets the topic list.
-	 *
-	 * @param topicList the topic list
-	 */
-	public void setTopicList(Map<String, ITopic> topicList) {
-		this.topics = topicList;
-	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#getTopicTitles()
 	 */
 	@Override
@@ -285,80 +337,53 @@ public class Server extends UnicastRemoteObject implements IServer {
 		return l;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#addClient(core.IClient)
 	 */
 	@Override
-	public synchronized void addClient(IClient cl) throws RemoteException {
-		this.connectedClient.add(cl);
+	public synchronized void addClient(IClient client) throws RemoteException {
+		this.connectedClients.add(client);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#removeClient(core.IClient)
 	 */
 	@Override
-	public synchronized void removeClient(IClient cl) throws RemoteException {
-		this.connectedClient.remove(cl);
-	}
-	
-	/* (non-Javadoc)
-	 * @see core.IServer#addServer(core.IServer)
-	 */
-	@Override
-	public synchronized void addServer(IServer s) throws RemoteException, NotBoundException {
-		this.listServers.add(s);
-	}
-
-	/* (non-Javadoc)
-	 * @see core.IServer#removeServer(core.IServer)
-	 */
-	public synchronized void removeServer(IServer s) throws RemoteException {
-		this.listServers.remove(s);
+	public synchronized void removeClient(IClient client) throws RemoteException {
+		this.connectedClients.remove(client);
 	}
 	
 	/**
-	 * Notify remove.
-	 *
-	 * @param s the s
-	 * @throws RemoteException the remote exception
-	 */
-	public synchronized void notifyRemove(IServer s) throws RemoteException {
-		Thread t = new Thread(new Runnable(){
-
-			@Override
-			public void run() {
-				ArrayList<IServer> serverToRemove = new ArrayList<>();
-				for (IServer serv : listServers) {
-					try {
-						serv.removeServer(s);
-					} catch (RemoteException e) {
-						System.out.println("Exception : (Server) notifyRemove : server offline");
-						serverToRemove.add(serv);
-						//e.printStackTrace();
-					}
-				}
-				listServers.removeAll(serverToRemove);
-			}
-			
-		});
-		t.start();
-	}
-
-	/* (non-Javadoc)
 	 * @see core.IServer#getConnectedClient()
 	 */
 	@Override
-	public Collection<IClient> getConnectedClient() throws RemoteException {
-		return this.connectedClient;
+	public Collection<IClient> getConnectedClients() throws RemoteException {
+		return this.connectedClients;
 	}
 	
-	/* (non-Javadoc)
+	/**
+	 * @see core.IServer#addAccount(java.lang.String)
+	 */
+	@Override
+	public void createAccount(String client) throws RemoteException {
+		this.accounts.put(client, new Account(client));
+	}
+	
+	/**
+	 * @see core.IServer#removeAccount(java.lang.String)
+	 */
+	@Override
+	public void removeAccount(String pseudo) throws RemoteException {
+		this.accounts.remove(pseudo);
+	}
+	
+	/**
 	 * @see core.IServer#getAccount(java.lang.String)
 	 */
 	@Override
-	public synchronized IAccount getAccount(String cl) throws RemoteException {
+	public synchronized IAccount getAccount(String pseudo) throws RemoteException {
 		IServer s = this;
-		if (this.accounts.get(cl) == null) {
+		if (this.accounts.get(pseudo) == null) {
 			Thread t = new Thread(new Runnable(){
 				@Override
 				public void run() {
@@ -366,7 +391,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 					for (IServer serv : listServers) {
 						if(!serv.equals(s))
 							try {
-								serv.addAccount(cl);
+								serv.createAccount(pseudo);
 							} catch (RemoteException e) {
 								System.out.println("Exception : (Server) getAccount : server offline");
 								serverToRemove.add(serv);
@@ -377,90 +402,20 @@ public class Server extends UnicastRemoteObject implements IServer {
 				}
 			});
 			t.start();
-			this.addAccount(cl);
+			this.createAccount(pseudo);
 		}
-		return this.accounts.get(cl);
+		return this.accounts.get(pseudo);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#getAccountList()
 	 */
 	@Override
 	public Map<String, IAccount> getAccountList() throws RemoteException {
 		return this.accounts;
 	}
-
-	/* (non-Javadoc)
-	 * @see core.IServer#postMessage(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void postMessage(String topicTitle, String author, String msg) throws RemoteException {
-		IServer s = this;
-		Thread t = new Thread(new Runnable(){
-
-			@Override
-			public void run() {
-				ArrayList<IServer> serverToRemove = new ArrayList<>();
-				for (IServer serv : listServers) {
-					if(!serv.equals(s)){
-						try{
-							System.out.println(serv.getPort());
-							serv.getTopic(topicTitle).post(author, msg);
-						}catch(RemoteException e){
-							System.out.println("Exception : (Server)postMessage : server offline");
-							serverToRemove.add(serv);
-						}
-					}
-				}
-				listServers.removeAll(serverToRemove);
-			}
-			
-		});
-		t.start();
-		this.getTopic(topicTitle).post(author, msg);
-	}
-
-	/* (non-Javadoc)
-	 * @see core.IServer#getPort()
-	 */
-	@Override
-	public String getPort() throws RemoteException {
-		return this.port;
-	}
-
-	/* (non-Javadoc)
-	 * @see core.IServer#getIP()
-	 */
-	@Override
-	public String getIP() throws RemoteException {
-		return this.ip;
-	}
-
-	/* (non-Javadoc)
-	 * @see core.IServer#getServerList()
-	 */
-	@Override
-	public Collection<IServer> getServerList() throws RemoteException {
-		return this.listServers;
-	}
-
-	/* (non-Javadoc)
-	 * @see core.IServer#addAccount(java.lang.String)
-	 */
-	@Override
-	public void addAccount(String cl) throws RemoteException {
-		this.accounts.put(cl, new Account(cl));
-	}
 	
-	/* (non-Javadoc)
-	 * @see core.IServer#removeAccount(java.lang.String)
-	 */
-	@Override
-	public void removeAccount(String cl) throws RemoteException {
-		this.accounts.remove(cl);
-	}
-
-	/* (non-Javadoc)
+	/**
 	 * @see core.IServer#subscribe(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -491,12 +446,51 @@ public class Server extends UnicastRemoteObject implements IServer {
 		this.getTopic(topicTitle).subscribe(pseudo);
 		this.getAccount(pseudo).addSubscription(topicTitle);
 	}
-
-	/* (non-Javadoc)
-	 * @see core.IServer#removeTopic(java.lang.String)
+	
+	/**
+	 * @see core.IServer#unsubscribe(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void removeTopic(String topicTitle) throws RemoteException {
-		this.topics.remove(topicTitle);
+	public void unsubscribe(String topicTitle, String pseudo) throws RemoteException {
+		IServer s = this;
+		Thread t = new Thread(new Runnable(){
+
+			@Override
+			public void run() {
+				ArrayList<IServer> serverToRemove = new ArrayList<>();
+				for(IServer serv : listServers){
+					if(!serv.equals(s)){
+						try {
+							serv.getTopic(topicTitle).unsubscribe(pseudo);
+							serv.getAccount(pseudo).removeSubscription(topicTitle);
+						} catch (RemoteException e) {
+							System.out.println("Exception : (Server) unsubscribe : server offline");
+							serverToRemove.add(serv);
+							//e.printStackTrace();
+						}
+					}
+				}
+				listServers.removeAll(serverToRemove);
+			}
+			
+		});
+		t.start();
+		this.getTopic(topicTitle).unsubscribe(pseudo);
+		this.getAccount(pseudo).removeSubscription(topicTitle);
+	}
+	
+	/**
+	 * Handles server activity on disconnect.
+	 *
+	 * @throws RemoteException the remote exception
+	 */
+	public void onDisconnect() throws RemoteException {
+		for (IClient c : this.connectedClients) {
+			try {
+				c.onServerDown();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

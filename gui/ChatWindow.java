@@ -246,7 +246,7 @@ public class ChatWindow extends Application {
 			if (!input.getText().equals("")) {
 				client.post(input.getText(), topic);
 				server.getAccount(identifiants).incrementsNbMsg();
-				server.getTopic(topic).addNbMsg(identifiants);
+				server.getTopic(topic).refreshNbMsg(identifiants);
 				account.setText(identifiants + "\n" + server.getAccount(identifiants).getNbMsg()
 						+ " message(s) au total\n dont " + server.getTopic(topic).getClientList().get(identifiants)
 						+ " dans ce sujet\n\n");

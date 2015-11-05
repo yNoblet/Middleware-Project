@@ -156,11 +156,12 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					String title = listSubscribed.getSelectionModel().getSelectedItem();
-					client.removeSubscribedTopic(title);
-					server.getTopic(title).unsubscribe((client.getPseudo()));
-					subscribedTopics.remove(title);
-					availableTopics.add(title);
+					String topicTitle = listSubscribed.getSelectionModel().getSelectedItem();
+					//client.removeSubscribedTopic(title);
+					//server.getTopic(title).unsubscribe((client.getPseudo()));
+					server.unsubscribe(topicTitle, client.getPseudo());
+					subscribedTopics.remove(topicTitle);
+					availableTopics.add(topicTitle);
 					if (subscribedTopics.isEmpty()) {
 						btnGo.setDisable(true);
 						btnUnsub.setDisable(true);
@@ -438,7 +439,7 @@ public class TopicWindow extends Application {
 				try {
 					String title = listeInscrits.getSelectionModel().getSelectedItem();
 					if (server.getTopic(title).getAuthor().equals(client.getPseudo())) {
-						server.deleteTopic(title);
+						server.onDeleteTopic(title);
 						if (subscribedTopics.isEmpty()) {
 							btnGo.setDisable(true);
 							btnDes.setDisable(true);
@@ -482,7 +483,7 @@ public class TopicWindow extends Application {
 			alert.showAndWait();
 		} else {
 			try {
-				if (server.newTopic(title, client.getPseudo())) {
+				if (server.onCreateNewTopic(title, client.getPseudo())) {
 					dialog.close();
 					subscribedTopics.add(title);
 					availableTopics.remove(title);

@@ -1,29 +1,28 @@
 package core;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Message.
  */
 public class Message {
 	
-	/** The author. */
+	/** The author of the message. */
 	private String author;
 	
-	/** The text. */
+	/** The text of the message. */
 	private String text;
 	
 	/**
 	 * Instantiates a new message.
 	 *
-	 * @param pseudo the pseudo
-	 * @param message the message
+	 * @param pseudo the pseudo of the author
+	 * @param message the content of the message
 	 */
 	public Message(String pseudo, String message) {
 		this.author = pseudo;
 		this.text = message;
 	} 
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -32,38 +31,11 @@ public class Message {
 	}
 
 	/**
-	 * Gets the author.
+	 * Gets the author of the message.
 	 *
 	 * @return the author
 	 */
 	public String getAuthor() {
 		return this.author;
-	}
-	
-	/**
-	 * Sets the author.
-	 *
-	 * @param author the new author
-	 */
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-	
-	/**
-	 * Gets the text.
-	 *
-	 * @return the text
-	 */
-	public String getText() {
-		return this.text;
-	}
-	
-	/**
-	 * Sets the text.
-	 *
-	 * @param text the new text
-	 */
-	public void setText(String text) {
-		this.text = text;
 	}
 }

@@ -4,90 +4,90 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface ITopic.
  */
 public interface ITopic extends Remote {
 	
 	/**
-	 * Gets the title.
+	 * Gets the title of the topic.
 	 *
-	 * @return the title
+	 * @return the title of the topic
 	 * @throws RemoteException the remote exception
 	 */
 	public String getTitle() throws RemoteException;
 	
 	/**
-	 * Gets the author.
+	 * Gets the author of the topic.
 	 *
-	 * @return the author
+	 * @return the author of the topic
 	 * @throws RemoteException the remote exception
 	 */
 	public String getAuthor() throws RemoteException;
 	
 	/**
-	 * Gets the client list.
+	 * Gets the creation date of the topic.
 	 *
-	 * @return the client list
-	 * @throws RemoteException the remote exception
-	 */
-	public Map<String, Integer> getClientList() throws RemoteException;
-	
-	/**
-	 * Gets the date.
-	 *
-	 * @return the date
+	 * @return the date of creation
 	 * @throws RemoteException the remote exception
 	 */
 	public String getDate() throws RemoteException;
 	
 	/**
-	 * Subscribe.
+	 * Gets the list of clients who subscribed.
 	 *
-	 * @param pseudo the pseudo
+	 * @return the client list
 	 * @throws RemoteException the remote exception
 	 */
-	public void subscribe(String pseudo) throws RemoteException;
-	
-	/**
-	 * Unsubscribe.
-	 *
-	 * @param pseudo the pseudo
-	 * @throws RemoteException the remote exception
-	 */
-	public void unsubscribe(String pseudo) throws RemoteException;
+	public Map<String, Integer> getClientList() throws RemoteException;
 
 	/**
-	 * Post.
+	 * Posts a message on the topic.
 	 *
-	 * @param pseudo the pseudo
-	 * @param message the message
+	 * @param pseudo the author pseudonym of the message
+	 * @param message the content of the message
 	 * @throws RemoteException the remote exception
 	 */
 	public void post(String pseudo, String message) throws RemoteException;
 	
 	/**
-	 * Connect client.
+	 * Refreshes the number of messages of the client.
 	 *
-	 * @param cl the cl
+	 * @param client the affected client
 	 * @throws RemoteException the remote exception
 	 */
-	public void connectClient(IClient cl) throws RemoteException;
+	public void refreshNbMsg(String client) throws RemoteException;
 	
 	/**
-	 * Disconnect client.
+	 * Subscribe an account to the topic.
 	 *
-	 * @param cl the cl
+	 * @param pseudo the account pseudonym
 	 * @throws RemoteException the remote exception
 	 */
-	public void disconnectClient(IClient cl) throws RemoteException;
-
+	public void subscribe(String pseudo) throws RemoteException;
+	
 	/**
-	 * Adds the nb msg.
+	 * Unsubscribe an account from the topic.
+	 *
+	 * @param pseudo the account pseudonym
+	 * @throws RemoteException the remote exception
+	 */
+	public void unsubscribe(String pseudo) throws RemoteException;
+	
+	/**
+	 * Connect a client to the topic.
 	 *
 	 * @param client the client
 	 * @throws RemoteException the remote exception
 	 */
-	public void addNbMsg(String client) throws RemoteException;
+	public void connectClient(IClient client) throws RemoteException;
+	
+	/**
+	 * Disconnect a client from the topic.
+	 *
+	 * @param client the client
+	 * @throws RemoteException the remote exception
+	 */
+	public void disconnectClient(IClient client) throws RemoteException;
+	
 }
