@@ -23,14 +23,30 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ServerConfigWindow.
+ */
 public class ServerConfigWindow extends Application {
+	
+	/** The ip. */
 	TextField ip;
+	
+	/** The port. */
 	TextField port;
+	
+	/** The primary stage. */
 	Stage primaryStage;
 	
+	/** The ip def. */
 	public final String IP_DEF = "localhost";
+	
+	/** The port def. */
 	public final String PORT_DEF = "1097";
 	
+	/* (non-Javadoc)
+	 * @see javafx.application.Application#start(javafx.stage.Stage)
+	 */
 	@Override
 	public void start(Stage primaryStage) {
 		
@@ -93,6 +109,9 @@ public class ServerConfigWindow extends Application {
 
 	}
 	
+	/**
+	 * On enter.
+	 */
 	private void onEnter(){
 		if (ip.getText().equals("") ){
 			Alert alert = new Alert(AlertType.ERROR);
@@ -139,6 +158,11 @@ public class ServerConfigWindow extends Application {
 		}
 	}
 	
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}

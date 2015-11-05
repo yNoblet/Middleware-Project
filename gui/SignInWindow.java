@@ -24,11 +24,24 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SignInWindow.
+ */
 public class SignInWindow extends Application {
+	
+	/** The login. */
 	TextField login;
+	
+	/** The server. */
 	IServer server;
+	
+	/** The primary stage. */
 	private Stage primaryStage;
 	
+	/* (non-Javadoc)
+	 * @see javafx.application.Application#start(javafx.stage.Stage)
+	 */
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage=primaryStage;
@@ -76,10 +89,19 @@ public class SignInWindow extends Application {
 		grid.add(btn, 1, 4);
 
 	}
+	
+	/**
+	 * Sets the server.
+	 *
+	 * @param s the new server
+	 */
 	public void setServer(IServer s){
 		server=s;
 	}
 	
+	/**
+	 * On enter.
+	 */
 	private void onEnter(){
 		if (login.getText().equals("")){
 			Alert alert = new Alert(AlertType.ERROR);
@@ -107,6 +129,11 @@ public class SignInWindow extends Application {
 		}
 	}
 	
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}

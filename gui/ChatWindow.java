@@ -22,37 +22,84 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ChatWindow.
+ */
 public class ChatWindow extends Application {
 
+	/** The input. */
 	private TextField input = new TextField();
+	
+	/** The output. */
 	private TextArea output = new TextArea();
+	
+	/** The account. */
 	private Text account = new Text();
+	
+	/** The topic. */
 	String topic;
+	
+	/** The primary stage. */
 	private Stage primaryStage;
+	
+	/** The identifiants. */
 	String identifiants;
+	
+	/** The server. */
 	IServer server;
+	
+	/** The client. */
 	IClient client;
 
+	/**
+	 * Sets the client.
+	 *
+	 * @param client the new client
+	 */
 	public void setClient(IClient client) {
 		this.client = client;
 	}
 
+	/**
+	 * Gets the topic.
+	 *
+	 * @return the topic
+	 */
 	public String getTopic() {
 		return this.topic;
 	}
 
+	/**
+	 * Sets the server.
+	 *
+	 * @param server the new server
+	 */
 	public void setServer(IServer server) {
 		this.server = server;
 	}
 
+	/**
+	 * Sets the topic.
+	 *
+	 * @param topic the new topic
+	 */
 	public void setTopic(String topic) {
 		this.topic = topic;
 	}
 
+	/**
+	 * Sets the identifiants.
+	 *
+	 * @param id the new identifiants
+	 */
 	public void setIdentifiants(String id) {
 		this.identifiants = id;
 	}
 
+	/* (non-Javadoc)
+	 * @see javafx.application.Application#start(javafx.stage.Stage)
+	 */
 	@Override
 	public void start(Stage primaryStage) throws RemoteException {
 
@@ -94,7 +141,7 @@ public class ChatWindow extends Application {
 				ft.start(primaryStage);
 				try {
 					server.removeClient(client);
-					client.removeConnectedTopic(topic);
+					client.removeConnectedTopic();
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -110,7 +157,7 @@ public class ChatWindow extends Application {
 			public void handle(ActionEvent event) {
 				TopicWindow ft = new TopicWindow();
 				try {
-					client.removeConnectedTopic(topic);
+					client.removeConnectedTopic();
 					client.setTopicWindow(ft);
 					topic = "";
 					ft.start(primaryStage);
@@ -163,6 +210,9 @@ public class ChatWindow extends Application {
 		grid.add(btn, 5, 9, 1, 1);
 	}
 
+	/**
+	 * On delete topic.
+	 */
 	public void onDeleteTopic() {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -175,9 +225,10 @@ public class ChatWindow extends Application {
 				alert.showAndWait();
 				TopicWindow ft = new TopicWindow();
 				try {
-					client.removeConnectedTopic(topic);
+					client.removeConnectedTopic();
 					client.setTopicWindow(ft);
 					ft.start(primaryStage);
+					ft.removeTopic(topic);
 					System.out.println("Go back");
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -187,11 +238,14 @@ public class ChatWindow extends Application {
 		});
 	}
 
+	/**
+	 * Post.
+	 */
 	private void post() {
 		try {
 			if (!input.getText().equals("")) {
 				client.post(input.getText(), topic);
-				server.getAccount(identifiants).addNbMsg(1);
+				server.getAccount(identifiants).incrementsNbMsg();
 				server.getTopic(topic).addNbMsg(identifiants);
 				account.setText(identifiants + "\n" + server.getAccount(identifiants).getNbMsg()
 						+ " message(s) au total\n dont " + server.getTopic(topic).getClientList().get(identifiants)
@@ -199,15 +253,23 @@ public class ChatWindow extends Application {
 				input.clear();
 			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Exception : (ChatWindow) post : server offline");
+			//e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Display msg.
+	 *
+	 * @param msg the msg
+	 */
 	public void displayMsg(String msg) {
 		output.appendText(msg);
 	}
 
+	/**
+	 * Server down.
+	 */
 	public void serverDown() {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -224,6 +286,11 @@ public class ChatWindow extends Application {
 		});
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}

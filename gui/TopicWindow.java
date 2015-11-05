@@ -30,15 +30,33 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TopicWindow.
+ */
 public class TopicWindow extends Application {
 
+	/** The client. */
 	IClient client;
+	
+	/** The server. */
 	IServer server;
+	
+	/** The identifiants. */
 	Text identifiants = new Text("Bienvenue test");
+	
+	/** The subscribed topics. */
 	ObservableList<String> subscribedTopics = FXCollections.observableArrayList();
+	
+	/** The available topics. */
 	ObservableList<String> availableTopics = FXCollections.observableArrayList();
+	
+	/** The primary stage. */
 	private Stage primaryStage;
 
+	/* (non-Javadoc)
+	 * @see javafx.application.Application#start(javafx.stage.Stage)
+	 */
 	@Override
 	public void start(Stage primaryStage) throws RemoteException {
 
@@ -203,11 +221,12 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					String title = listAvailables.getSelectionModel().getSelectedItem();
-					client.addSubscribedTopic(title);
-					server.getTopic(title).subscribe(client.getPseudo());
-					subscribedTopics.add(title);
-					availableTopics.remove(title);
+					String topicTitle = listAvailables.getSelectionModel().getSelectedItem();
+					//client.addSubscribedTopic(topicTitle);
+					//server.getTopic(title).subscribe(client.getPseudo());
+					server.subscribe(topicTitle, client.getPseudo());
+					subscribedTopics.add(topicTitle);
+					availableTopics.remove(topicTitle);
 					if (availableTopics.isEmpty()) {
 						btnInscri.setDisable(true);
 					}
@@ -253,10 +272,20 @@ public class TopicWindow extends Application {
 
 	}
 
+	/**
+	 * Sets the client.
+	 *
+	 * @param cl the new client
+	 */
 	public void setClient(IClient cl) {
 		client = cl;
 	}
 
+	/**
+	 * Sets the pseudo.
+	 *
+	 * @param p the new pseudo
+	 */
 	public void setPseudo(String p) {
 		Text t = new Text("Bienvenue " + p);
 		t.setStyle("-fx-font-size:19px");
@@ -264,14 +293,29 @@ public class TopicWindow extends Application {
 		identifiants = t;
 	}
 
+	/**
+	 * Sets the subscribed topic.
+	 *
+	 * @param c the new subscribed topic
+	 */
 	public void setSubscribedTopic(Collection<String> c) {
 		subscribedTopics.addAll(c);
 	}
 
+	/**
+	 * Sets the available topic.
+	 *
+	 * @param c the new available topic
+	 */
 	public void setAvailableTopic(Collection<String> c) {
 		availableTopics.addAll(c);
 	}
 
+	/**
+	 * Adds the available topic.
+	 *
+	 * @param s the s
+	 */
 	public void addAvailableTopic(String s) {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -281,6 +325,11 @@ public class TopicWindow extends Application {
 		});
 	}
 
+	/**
+	 * Removes the topic.
+	 *
+	 * @param s the s
+	 */
 	public void removeTopic(String s) {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -291,10 +340,18 @@ public class TopicWindow extends Application {
 		});
 	}
 
+	/**
+	 * Sets the server.
+	 *
+	 * @param server the new server
+	 */
 	public void setServer(IServer server) {
 		this.server = server;
 	}
 
+	/**
+	 * Server down.
+	 */
 	public void serverDown() {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -311,6 +368,9 @@ public class TopicWindow extends Application {
 		});
 	}
 
+	/**
+	 * Creates the new topic.
+	 */
 	private void createNewTopic() {
 		final Stage dialog = new Stage();
 		dialog.initModality(Modality.APPLICATION_MODAL);
@@ -343,6 +403,14 @@ public class TopicWindow extends Application {
 		});
 	}
 
+	/**
+	 * Delete topic.
+	 *
+	 * @param listeInscrits the liste inscrits
+	 * @param btnGo the btn go
+	 * @param btnDes the btn des
+	 * @param btnSuppr the btn suppr
+	 */
 	private void deleteTopic(ListView<String> listeInscrits, Button btnGo, Button btnDes, Button btnSuppr) {
 		final Stage dialog = new Stage();
 		GridPane grid = new GridPane();
@@ -399,6 +467,12 @@ public class TopicWindow extends Application {
 		});
 	}
 
+	/**
+	 * On enter new topic.
+	 *
+	 * @param title the title
+	 * @param dialog the dialog
+	 */
 	private void onEnterNewTopic(String title, Stage dialog) {
 		if (title.equals("")) {
 			Alert alert = new Alert(AlertType.ERROR);
@@ -426,6 +500,11 @@ public class TopicWindow extends Application {
 		}
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
