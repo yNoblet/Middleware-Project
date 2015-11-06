@@ -80,6 +80,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 			}
 			s.addServer(this);
 			this.listServers.add(this);
+			for (Entry<String, IAccount> entry : s.getAccountList().entrySet()) {
+				this.accounts.put(entry.getKey(), entry.getValue());
+			}
+			for (Entry<String, ITopic> entry : s.getTopicList().entrySet()) {
+				this.topics.put(entry.getKey(), entry.getValue());
+			}
 
 		}
 

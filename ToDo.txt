@@ -1,12 +1,9 @@
-Suppression de topic
 Synchronisation de création de projet  X
 persistance des données (serveur HS)
 Serveurs multiples
-	-plus de tests sur l'échange de données
-	-gérer le crash d'un serveur
-	-vérifier abonnements après relog après crash
+	-récupération des données les plus récentes à la création du serveur
 Passwords + bouton inscription
-emoticones
-/snake pour pendu
 Rajouter infos sur chat
 	-garder nb message client ?
+	-nb messages/topic
+Maveniser
