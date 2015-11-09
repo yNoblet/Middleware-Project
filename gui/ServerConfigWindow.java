@@ -23,28 +23,23 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ServerConfigWindow.
  */
 public class ServerConfigWindow extends Application {
 	
-	/** The ip. */
+	/** The IP address of the server. */
 	TextField ip;
 	
-	/** The port. */
+	/** The port opened for this server. */
 	TextField port;
 	
-	/** The primary stage. */
 	Stage primaryStage;
 	
-	/** The ip def. */
 	public final String IP_DEF = "localhost";
-	
-	/** The port def. */
 	public final String PORT_DEF = "1097";
 	
-	/* (non-Javadoc)
+	/**
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
@@ -72,9 +67,9 @@ public class ServerConfigWindow extends Application {
 			}
 		});
 	
-		Button btn = new Button();
-		btn.setText("Valider");
-		btn.setOnAction(new EventHandler<ActionEvent>() {
+		Button btnValidate = new Button();
+		btnValidate.setText("Valider");
+		btnValidate.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				onEnter();
@@ -95,9 +90,9 @@ public class ServerConfigWindow extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text scenetitle = new Text("Configuration du serveur");
-		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(scenetitle, 0, 0, 2, 1);
+		Text sceneTitle = new Text("Configuration du serveur");
+		sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		grid.add(sceneTitle, 0, 0, 2, 1);
 
 		Label labelIP = new Label("IP serveur:");
 		grid.add(labelIP, 0, 1);
@@ -105,7 +100,7 @@ public class ServerConfigWindow extends Application {
 		Label labelPort = new Label("Port serveur:");
 		grid.add(labelPort, 0, 2);
 		grid.add(port, 1, 2);
-		grid.add(btn, 1, 3);
+		grid.add(btnValidate, 1, 3);
 
 	}
 	

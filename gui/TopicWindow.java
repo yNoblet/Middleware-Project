@@ -30,7 +30,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TopicWindow.
  */
@@ -42,8 +41,8 @@ public class TopicWindow extends Application {
 	/** The server. */
 	IServer server;
 	
-	/** The identifiants. */
-	Text identifiants = new Text("Bienvenue test");
+	/** The pseudonym of the client. */
+	Text pseudonym = new Text("Bienvenue test");
 	
 	/** The subscribed topics. */
 	ObservableList<String> subscribedTopics = FXCollections.observableArrayList();
@@ -51,10 +50,9 @@ public class TopicWindow extends Application {
 	/** The available topics. */
 	ObservableList<String> availableTopics = FXCollections.observableArrayList();
 	
-	/** The primary stage. */
 	private Stage primaryStage;
 
-	/* (non-Javadoc)
+	/**
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
@@ -62,7 +60,7 @@ public class TopicWindow extends Application {
 
 		this.primaryStage = primaryStage;
 
-		identifiants.setStyle("-fx-font-size:19px");
+		pseudonym.setStyle("-fx-font-size:19px");
 
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -89,9 +87,9 @@ public class TopicWindow extends Application {
 		btnGo.setText("Aller");
 		btnGo.setDisable(true);
 
-		Button btnUnsub = new Button();
-		btnUnsub.setText("Se désinscrire");
-		btnUnsub.setDisable(true);
+		Button btnUnsubscribe = new Button();
+		btnUnsubscribe.setText("Se désinscrire");
+		btnUnsubscribe.setDisable(true);
 
 		Button btnDelete = new Button();
 		btnDelete.setText("Détruire");
@@ -104,7 +102,7 @@ public class TopicWindow extends Application {
 					createNewTopic();
 				} else if (event.getCode() == KeyCode.DELETE) {
 					if (listSubscribed.getSelectionModel().getSelectedItem() != null && listSubscribed.isFocused()) {
-						deleteTopic(listSubscribed, btnGo, btnUnsub, btnDelete);
+						deleteTopic(listSubscribed, btnGo, btnUnsubscribe, btnDelete);
 					}
 				}
 			}
@@ -152,24 +150,22 @@ public class TopicWindow extends Application {
 			}
 		});
 
-		btnUnsub.setOnAction(new EventHandler<ActionEvent>() {
+		btnUnsubscribe.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
 					String topicTitle = listSubscribed.getSelectionModel().getSelectedItem();
-					//client.removeSubscribedTopic(title);
-					//server.getTopic(title).unsubscribe((client.getPseudo()));
 					server.unsubscribe(topicTitle, client.getPseudo());
 					subscribedTopics.remove(topicTitle);
 					availableTopics.add(topicTitle);
 					if (subscribedTopics.isEmpty()) {
 						btnGo.setDisable(true);
-						btnUnsub.setDisable(true);
+						btnUnsubscribe.setDisable(true);
 						btnDelete.setDisable(true);
 					}
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Exception : (TopicWindow) event button unsubscribe");
+					//e.printStackTrace();
 				}
 			}
 		});
@@ -177,17 +173,17 @@ public class TopicWindow extends Application {
 		btnDelete.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				deleteTopic(listSubscribed, btnGo, btnUnsub, btnDelete);
+				deleteTopic(listSubscribed, btnGo, btnUnsubscribe, btnDelete);
 			}
 		});
 
-		Button btnInscri = new Button();
+		Button btnSubscribe = new Button();
 
 		listSubscribed.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if (listAvailables.getSelectionModel().getSelectedItem() != null) {
-					btnInscri.setDisable(newValue);
+					btnSubscribe.setDisable(newValue);
 				}
 			}
 		});
@@ -196,29 +192,28 @@ public class TopicWindow extends Application {
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if (listSubscribed.getSelectionModel().getSelectedItem() != null) {
 					btnGo.setDisable(newValue);
-					btnUnsub.setDisable(newValue);
+					btnUnsubscribe.setDisable(newValue);
 					btnDelete.setDisable(newValue);
 				}
 			}
 		});
 
-		/**/
 		listSubscribed.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				btnGo.setDisable(newValue == null);
-				btnUnsub.setDisable(newValue == null);
+				btnUnsubscribe.setDisable(newValue == null);
 				btnDelete.setDisable(newValue == null);
 
 			}
 		});
 
 		/* Creation des boutons pour les sujets non-inscrits */
-		btnInscri.setText("S'inscrire");
-		btnInscri.setDisable(true);
+		btnSubscribe.setText("S'inscrire");
+		btnSubscribe.setDisable(true);
 
 		/* Definition des evenements associés pour chacun des boutons */
-		btnInscri.setOnAction(new EventHandler<ActionEvent>() {
+		btnSubscribe.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
@@ -229,11 +224,11 @@ public class TopicWindow extends Application {
 					subscribedTopics.add(topicTitle);
 					availableTopics.remove(topicTitle);
 					if (availableTopics.isEmpty()) {
-						btnInscri.setDisable(true);
+						btnSubscribe.setDisable(true);
 					}
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Exception : (TopicWindow) event button subscribe");
+					//e.printStackTrace();
 				}
 
 			}
@@ -242,34 +237,34 @@ public class TopicWindow extends Application {
 		listAvailables.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				btnInscri.setDisable(newValue == null);
+				btnSubscribe.setDisable(newValue == null);
 			}
 		});
 
 		/* Definition de la taille des objets graphiques */
-		identifiants.setWrappingWidth(400);
+		pseudonym.setWrappingWidth(400);
 		btnNew.setPrefWidth(420);
 		HBox hb = new HBox();
 		hb.setPrefWidth(100);
 		btnDeco.setPrefWidth(110);
 		btnGo.setPrefWidth(100);
 		btnDelete.setPrefWidth(100);
-		btnInscri.setPrefWidth(100);
+		btnSubscribe.setPrefWidth(100);
 		btnDelete.setPrefWidth(110);
 
 		/* Positionnement des éléments dans la grille/fenêtre principale */
-		grid.add(identifiants, 0, 0, 2, 1);
+		grid.add(pseudonym, 0, 0, 2, 1);
 		grid.add(hb, 2, 0, 1, 1);
 		grid.add(btnDeco, 3, 0, 1, 1);
 		grid.add(btnNew, 0, 1, 4, 1);
 		grid.add(topicsIns, 0, 2, 2, 1);
 		grid.add(listSubscribed, 0, 3, 4, 2);
 		grid.add(btnGo, 0, 5, 1, 1);
-		grid.add(btnUnsub, 1, 5, 1, 1);
+		grid.add(btnUnsubscribe, 1, 5, 1, 1);
 		grid.add(btnDelete, 3, 5, 1, 1);
 		grid.add(topicsDispos, 0, 6, 2, 1);
 		grid.add(listAvailables, 0, 7, 4, 2);
-		grid.add(btnInscri, 0, 9, 1, 1);
+		grid.add(btnSubscribe, 0, 9, 1, 1);
 
 	}
 
@@ -291,7 +286,7 @@ public class TopicWindow extends Application {
 		Text t = new Text("Bienvenue " + p);
 		t.setStyle("-fx-font-size:19px");
 		t.setWrappingWidth(292);
-		identifiants = t;
+		pseudonym = t;
 	}
 
 	/**
@@ -380,14 +375,14 @@ public class TopicWindow extends Application {
 		dialogVbox.getChildren().add(new Text("Choisissez le titre du nouveau sujet :"));
 		TextField topicTitle = new TextField();
 		dialogVbox.getChildren().add(topicTitle);
-		Button btnNT = new Button();
-		dialogVbox.getChildren().add(btnNT);
-		btnNT.setText("Créer");
+		Button btnNewTopic = new Button();
+		dialogVbox.getChildren().add(btnNewTopic);
+		btnNewTopic.setText("Créer");
 		Scene dialogScene = new Scene(dialogVbox, 300, 120);
 		dialog.setScene(dialogScene);
 		dialog.show();
 
-		btnNT.setOnAction(new EventHandler<ActionEvent>() {
+		btnNewTopic.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				onEnterNewTopic(topicTitle.getText(), dialog);
@@ -407,12 +402,12 @@ public class TopicWindow extends Application {
 	/**
 	 * Delete topic.
 	 *
-	 * @param listeInscrits the liste inscrits
-	 * @param btnGo the btn go
-	 * @param btnDes the btn des
-	 * @param btnSuppr the btn suppr
+	 * @param listSubscribed the list of subscribed topics
+	 * @param btnGo the button to go to the topic
+	 * @param btnUnsub the button to unsubscribe from a topic
+	 * @param btnDelete the button to delete a topic
 	 */
-	private void deleteTopic(ListView<String> listeInscrits, Button btnGo, Button btnDes, Button btnSuppr) {
+	private void deleteTopic(ListView<String> listSubscribed, Button btnGo, Button btnUnsub, Button btnDelete) {
 		final Stage dialog = new Stage();
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -437,13 +432,13 @@ public class TopicWindow extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					String title = listeInscrits.getSelectionModel().getSelectedItem();
+					String title = listSubscribed.getSelectionModel().getSelectedItem();
 					if (server.getTopic(title).getAuthor().equals(client.getPseudo())) {
 						server.onDeleteTopic(title);
 						if (subscribedTopics.isEmpty()) {
 							btnGo.setDisable(true);
-							btnDes.setDisable(true);
-							btnSuppr.setDisable(true);
+							btnUnsub.setDisable(true);
+							btnDelete.setDisable(true);
 						}
 					} else {
 						Alert alert = new Alert(AlertType.ERROR);
@@ -453,8 +448,8 @@ public class TopicWindow extends Application {
 						alert.showAndWait();
 					}
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Exception : (TopicWindow) deleteTopic : server offline");
+					//e.printStackTrace();
 				}
 				dialog.close();
 			}
@@ -471,8 +466,8 @@ public class TopicWindow extends Application {
 	/**
 	 * On enter new topic.
 	 *
-	 * @param title the title
-	 * @param dialog the dialog
+	 * @param title the title of the topic
+	 * @param dialog the window displayed
 	 */
 	private void onEnterNewTopic(String title, Stage dialog) {
 		if (title.equals("")) {
@@ -495,8 +490,8 @@ public class TopicWindow extends Application {
 					alert.showAndWait();
 				}
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("Exception : (TopicWindow) onEnterNewTopic : server offline");
+				//e.printStackTrace();
 			}
 		}
 	}

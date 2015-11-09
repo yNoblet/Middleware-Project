@@ -132,7 +132,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 					nbConnectedClient = serv.getConnectedClients().size();
 				}
 			}catch(RemoteException e){
-				System.out.println("Exception : (Server) checkDistribution : server offline");
+				System.err.println("Exception : (Server) checkDistribution : server offline");
 				serverToRemove.add(serv);
 			}
 		}
@@ -180,7 +180,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 							System.out.println(serv.getPort());
 							serv.getTopic(topicTitle).post(author, msg);
 						}catch(RemoteException e){
-							System.out.println("Exception : (Server) postMessage : server offline");
+							System.err.println("Exception : (Server) postMessage : server offline");
 							serverToRemove.add(serv);
 						}
 					}
@@ -219,12 +219,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 											c.onCreateTopic(title);
 										}
 									}catch(RemoteException e){
-										System.out.println("Exception : (Server) onCreateNewTopic : client offline");
+										System.err.println("Exception : (Server) onCreateNewTopic : client offline");
 										clientToRemove.add(c);
 									}
 								}
 							} catch (RemoteException e) {
-								System.out.println("Exception : (Server) onCreateNewTopic : server offline");
+								System.err.println("Exception : (Server) onCreateNewTopic : server offline");
 								serverToRemove.add(serv);
 								//e.printStackTrace();
 							}
@@ -274,12 +274,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 								try {
 									c.onDeleteTopic(title);
 								}catch(RemoteException e){
-									System.out.println("Exception : (Server) onDeleteTopic : client offline");
+									System.err.println("Exception : (Server) onDeleteTopic : client offline");
 									clientToRemove.add(c);
 								}
 							}
 						} catch (RemoteException e) {
-							System.out.println("Exception : (Server) onDeleteTopic : server offline");
+							System.err.println("Exception : (Server) onDeleteTopic : server offline");
 							serverToRemove.add(serv);
 							//e.printStackTrace();
 						}
@@ -399,7 +399,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 							try {
 								serv.createAccount(pseudo);
 							} catch (RemoteException e) {
-								System.out.println("Exception : (Server) getAccount : server offline");
+								System.err.println("Exception : (Server) getAccount : server offline");
 								serverToRemove.add(serv);
 								//e.printStackTrace();
 							}
@@ -438,7 +438,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 							serv.getTopic(topicTitle).subscribe(pseudo);
 							serv.getAccount(pseudo).addSubscription(topicTitle);
 						} catch (RemoteException e) {
-							System.out.println("Exception : (Server) subscribe : server offline");
+							System.err.println("Exception : (Server) subscribe : server offline");
 							serverToRemove.add(serv);
 							//e.printStackTrace();
 						}
@@ -470,7 +470,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 							serv.getTopic(topicTitle).unsubscribe(pseudo);
 							serv.getAccount(pseudo).removeSubscription(topicTitle);
 						} catch (RemoteException e) {
-							System.out.println("Exception : (Server) unsubscribe : server offline");
+							System.err.println("Exception : (Server) unsubscribe : server offline");
 							serverToRemove.add(serv);
 							//e.printStackTrace();
 						}

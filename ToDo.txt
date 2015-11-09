@@ -1,9 +1,3 @@
-Synchronisation de création de projet  X
+Vérifier Synchronisation
 persistance des données (serveur HS)
-Serveurs multiples
-	-récupération des données les plus récentes à la création du serveur
-Passwords + bouton inscription
-Rajouter infos sur chat
-	-garder nb message client ?
-	-nb messages/topic
 Maveniser

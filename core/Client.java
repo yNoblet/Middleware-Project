@@ -53,7 +53,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 				try {
 					onDisconnect();
 				} catch (RemoteException e) {
-					System.out.println("Exception : (Client) constructor : client offline");
+					System.err.println("Exception : (Client) constructor : client offline");
 				}
 			}
 		}));
@@ -168,7 +168,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 	@Override
 	public void setChatWindow(ChatWindow cw, String topicTitle) throws RemoteException {
 		this.cw = cw;
-		cw.setIdentifiants(this.pseudo);
+		cw.setPseudo(this.pseudo);
 		cw.setServer(this.server);
 		cw.setClient(this);
 		cw.setTopic(topicTitle);

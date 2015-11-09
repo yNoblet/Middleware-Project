@@ -22,34 +22,29 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ChatWindow.
  */
 public class ChatWindow extends Application {
 
-	/** The input. */
+	/** The textfield to type a message. */
 	private TextField input = new TextField();
 	
-	/** The output. */
+	/** The textarea to display messages send. */
 	private TextArea output = new TextArea();
 	
-	/** The account. */
+	/** Display the stats of the account. */
 	private Text account = new Text();
 	
-	/** The topic. */
+	/** The current topic. */
 	String topic;
 	
 	/** The primary stage. */
 	private Stage primaryStage;
 	
-	/** The identifiants. */
-	String identifiants;
-	
-	/** The server. */
+	/** The pseudonym of the account. */
+	String pseudo;
 	IServer server;
-	
-	/** The client. */
 	IClient client;
 
 	/**
@@ -89,15 +84,15 @@ public class ChatWindow extends Application {
 	}
 
 	/**
-	 * Sets the identifiants.
+	 * Sets the pseudo.
 	 *
-	 * @param id the new identifiants
+	 * @param id the new pseudo
 	 */
-	public void setIdentifiants(String id) {
-		this.identifiants = id;
+	public void setPseudo(String id) {
+		this.pseudo = id;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
@@ -116,7 +111,7 @@ public class ChatWindow extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-		Text id = new Text("Bienvenue " + identifiants + " !");
+		Text id = new Text("Bienvenue " + pseudo + " !");
 		Text scenetitle = new Text("Sujet : " + topic);
 		Text infoText = new Text("créé par " + " le");
 
@@ -124,10 +119,10 @@ public class ChatWindow extends Application {
 			infoText.setText(
 					"créé par " + this.server.getTopic(this.topic).getAuthor() + "\nle " + this.server.getTopic(this.topic).getDate());
 			this.account.setText(
-					this.identifiants + "\n" + this.server.getAccount(this.identifiants).getNbMsg() + " message(s) au total dont "
-							+ this.server.getTopic(this.topic).getClientList().get(this.identifiants) + " dans ce sujet");
+					this.pseudo + "\n" + this.server.getAccount(this.pseudo).getNbMsg() + " message(s) au total dont "
+							+ this.server.getTopic(this.topic).getClientList().get(this.pseudo) + " dans ce sujet");
 		} catch (RuntimeException e) {
-			this.account.setText(this.identifiants + "\n" + "0 message(s) au total dont 0 dans ce sujet");
+			this.account.setText(this.pseudo + "\n" + "0 message(s) au total dont 0 dans ce sujet");
 		}
 
 		this.account.setWrappingWidth(120);
@@ -143,16 +138,16 @@ public class ChatWindow extends Application {
 					server.removeClient(client);
 					client.removeConnectedTopic();
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Exception : (ChatWindow) event button deconnection");
+					//e.printStackTrace();
 				}
 				System.out.println("Logout");
 			}
 		});
 
-		Button btnR = new Button();
-		btnR.setText("Retour");
-		btnR.setOnAction(new EventHandler<ActionEvent>() {
+		Button btnBack = new Button();
+		btnBack.setText("Retour");
+		btnBack.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				TopicWindow ft = new TopicWindow();
@@ -163,14 +158,11 @@ public class ChatWindow extends Application {
 					ft.start(primaryStage);
 					System.out.println("Go back");
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Exception : (ChatWindow) event button back to Topic Window");
+					//e.printStackTrace();
 				}
 			}
 		});
-
-		// HBox hbID = new HBox();
-		// hbID.getChildren().addAll(id);
 
 		this.output.setEditable(false);
 		this.output.setStyle("-fx-border-style: none");
@@ -187,9 +179,9 @@ public class ChatWindow extends Application {
 			}
 		});
 
-		Button btn = new Button();
-		btn.setText("Valider");
-		btn.setOnAction(new EventHandler<ActionEvent>() {
+		Button btnValidate = new Button();
+		btnValidate.setText("Valider");
+		btnValidate.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -205,9 +197,9 @@ public class ChatWindow extends Application {
 		grid.add(this.input, 0, 9, 4, 1);
 
 		grid.add(btnDeco, 5, 0, 1, 1);
-		grid.add(btnR, 5, 1, 1, 1);
+		grid.add(btnBack, 5, 1, 1, 1);
 		grid.add(this.account, 5, 4, 2, 1);
-		grid.add(btn, 5, 9, 1, 1);
+		grid.add(btnValidate, 5, 9, 1, 1);
 	}
 
 	/**
@@ -231,29 +223,29 @@ public class ChatWindow extends Application {
 					ft.removeTopic(topic);
 					System.out.println("Go back");
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Exception : (ChatWindow) onDeleteTopic : client disconnected");
+					//e.printStackTrace();
 				}
 			}
 		});
 	}
 
 	/**
-	 * Post.
+	 * Send the message to the server.
 	 */
 	private void post() {
 		try {
 			if (!input.getText().equals("")) {
 				client.post(input.getText(), topic);
-				server.getAccount(identifiants).incrementsNbMsg();
-				server.getTopic(topic).refreshNbMsg(identifiants);
-				account.setText(identifiants + "\n" + server.getAccount(identifiants).getNbMsg()
-						+ " message(s) au total\n dont " + server.getTopic(topic).getClientList().get(identifiants)
+				server.getAccount(pseudo).incrementsNbMsg();
+				server.getTopic(topic).refreshNbMsg(pseudo);
+				account.setText(pseudo + "\n" + server.getAccount(pseudo).getNbMsg()
+						+ " message(s) au total\n dont " + server.getTopic(topic).getClientList().get(pseudo)
 						+ " dans ce sujet\n\n");
 				input.clear();
 			}
 		} catch (RemoteException e) {
-			System.out.println("Exception : (ChatWindow) post : server offline");
+			System.err.println("Exception : (ChatWindow) post : server offline");
 			//e.printStackTrace();
 		}
 	}
@@ -273,16 +265,7 @@ public class ChatWindow extends Application {
 	public void serverDown() {
 		Platform.runLater(new Runnable() {
 			@Override
-			public void run() {
-				/*Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Erreur");
-				alert.setHeaderText("Erreur de serveur");
-				alert.setContentText("Le serveur a été perdu !");
-				alert.showAndWait();*/
-
-				/*ServerConfigWindow scw = new ServerConfigWindow();
-				scw.start(primaryStage);*/
-			}
+			public void run() {}
 		});
 	}
 

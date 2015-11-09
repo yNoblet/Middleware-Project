@@ -2,7 +2,6 @@ package core;
 
 import java.util.Scanner;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class StartServer.
  */
@@ -25,16 +24,6 @@ public class StartServer {
 			sc.close();
 
 			new Server(adrP, portP, portS);
-			
-			/*
-			 * IAccount a = obj.getAccount("author1"); IAccount b =
-			 * obj.getAccount("A");
-			 *
-			 * obj.newTopic("a", "author1"); obj.newTopic("b", "author1");
-			 * obj.newTopic("c", "author1"); obj.newTopic("d", "author1");
-			 *
-			 * b.addSubscription("b"); b.addSubscription("c");
-			 */
 
 			System.out.println("Server launched");
 

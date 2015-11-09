@@ -142,7 +142,7 @@ public class Topic extends UnicastRemoteObject implements ITopic {
 			try{
 				c.refresh(msg);
 			}catch(RemoteException e){
-				System.out.println("client deconnecté");
+				System.err.println("Exception : (Topic) notifyMembers : client disconnected");
 				clientToRemove.add(c);
 			}
 		}

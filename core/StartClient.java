@@ -4,7 +4,6 @@ import gui.ServerConfigWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class StartClient.
  */

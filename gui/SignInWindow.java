@@ -24,7 +24,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SignInWindow.
  */
@@ -33,13 +32,12 @@ public class SignInWindow extends Application {
 	/** The login. */
 	TextField login;
 	
-	/** The server. */
+	/** The server chosen. */
 	IServer server;
 	
-	/** The primary stage. */
 	private Stage primaryStage;
 	
-	/* (non-Javadoc)
+	/**
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
@@ -56,9 +54,9 @@ public class SignInWindow extends Application {
 			}
 		});
 	
-		Button btn = new Button();
-		btn.setText("Valider");
-		btn.setOnAction(new EventHandler<ActionEvent>() {
+		Button btnValidate = new Button();
+		btnValidate.setText("Valider");
+		btnValidate.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				onEnter();
@@ -86,7 +84,7 @@ public class SignInWindow extends Application {
 		Label userName = new Label("Identifiant:");
 		grid.add(userName, 0, 1);
 		grid.add(login, 1, 1);
-		grid.add(btn, 1, 4);
+		grid.add(btnValidate, 1, 4);
 
 	}
 	
