@@ -1,9 +1,9 @@
-package gui;
+package fr.univnantes.middleware.gui;
 
 import java.rmi.RemoteException;
 
-import core.IClient;
-import core.IServer;
+import fr.univnantes.middleware.core.IClient;
+import fr.univnantes.middleware.core.IServer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;

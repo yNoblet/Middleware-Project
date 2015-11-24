@@ -1,3 +1,2 @@
 Vérifier Synchronisation
 persistance des données (serveur HS)
-Maveniser

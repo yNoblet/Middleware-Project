@@ -1,11 +1,11 @@
-package core;
+package fr.univnantes.middleware.core;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Collection;
 
-import gui.ChatWindow;
-import gui.TopicWindow;
+import fr.univnantes.middleware.gui.ChatWindow;
+import fr.univnantes.middleware.gui.TopicWindow;
 
 /**
  * The Class Client.

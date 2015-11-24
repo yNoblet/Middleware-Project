@@ -1,9 +1,9 @@
-package gui;
+package fr.univnantes.middleware.gui;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import core.IServer;
+import fr.univnantes.middleware.core.IServer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

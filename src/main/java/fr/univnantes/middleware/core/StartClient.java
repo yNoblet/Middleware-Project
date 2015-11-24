@@ -1,6 +1,6 @@
-package core;
+package fr.univnantes.middleware.core;
 
-import gui.ServerConfigWindow;
+import fr.univnantes.middleware.gui.ServerConfigWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

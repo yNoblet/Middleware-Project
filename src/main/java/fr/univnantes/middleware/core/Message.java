@@ -1,4 +1,4 @@
-package core;
+package fr.univnantes.middleware.core;
 
 /**
  * The Class Message.
