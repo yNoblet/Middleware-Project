@@ -68,7 +68,7 @@ public class SignInWindow extends Application {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.getStylesheets().add("gui/style.css");
+		grid.getStylesheets().add("style.css");
 
 		Scene scene = new Scene(grid, 350, 150);
 
